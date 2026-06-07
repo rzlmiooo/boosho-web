@@ -29,6 +29,18 @@ Berikut adalah tangkapan layar dari rancangan database, antarmuka aplikasi web, 
 
 ### Daftar Endpoint API (Postman)
 Berikut adalah 10 skenario pengujian API yang telah disusun dan diuji melalui Postman:
+### Daftar Endpoint API
+
+| Modul | Method | Endpoint (Route) | Deskripsi & Akses |
+| :--- | :--- | :--- | :--- |
+| **Buku** | GET | `/api/books` | Menampilkan semua data buku di katalog |
+| | GET | `/api/books/{id}` | Menampilkan detail data buku berdasarkan id |
+| | POST | `/api/books` | Menambahkan data buku baru ke katalog |
+| | PUT | `/api/books/{id}` | Update data spesifik buku berdasarkan id |
+| | DELETE | `/api/books/{id}` | Hapus data buku berdasarkan id |
+| | GET | `/api/books/search/{title}`| Melakukan pencarian buku berdasarkan judul |
+| **User** | GET | `/api/user` | Mendapatkan data profil user yang sedang login |
+
 ![Daftar Endpoint API](documentation/Screenshots/endpoint-api.png)
 *(Catatan tambahan: File asli hasil Export Collection JSON dari Postman dilampirkan secara lengkap di dalam folder `documentation/Postman API/BooSho API.postman_collection.json` pada repository ini).*
 
