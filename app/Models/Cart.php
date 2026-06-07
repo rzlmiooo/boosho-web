@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Cart extends Model
+{
+    protected $fillable = ['user_id', 'book_id', 'quantity'];
+
+    // Relasi: Keranjang memiliki 1 Buku
+    public function book()
+    {
+        return $this->belongsTo(Book::class);
+    }
+}
