@@ -8,8 +8,8 @@ use App\Models\Cart; // Tambahkan ini
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
-    return redirect('/login');
-});
+    return view('landing');
+})->name('landing');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
