@@ -57,8 +57,88 @@ Sistem ini menggunakan struktur standar Laravel dengan pengorganisasian dokumen 
 ### Status Database (Migration Tersedia)
 Database proyek ini sudah terintegrasi penuh menggunakan sistem *Migration* dari Laravel. File migrasi tabel (`users`, `books`, `carts`) tersedia lengkap di dalam direktori `database/migrations/`.
 
-**Cara Melakukan Setup Database:**
-1. Salin `env.example` menjadi `.env` dan konfigurasikan nama database MySQL Anda.
-2. Jalankan perintah ini di terminal untuk mengeksekusi migrasi dan membuat tabel secara otomatis:
-   ```bash
-   php artisan migrate
+# Instalasi Project
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/rzlmiooo/boosho-web.git
+```
+
+Masuk ke folder project:
+
+```bash
+cd library-app
+```
+
+---
+
+## 2. Install Dependency
+
+```bash
+composer install
+```
+
+---
+
+## 3. Copy File Environment
+
+Windows:
+
+```bash
+copy .env.example .env
+```
+
+Linux/Mac:
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## 4. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+---
+
+## 5. Konfigurasi Database
+
+Edit file `.env`
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=boosho
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Sesuaikan dengan database lokal Anda.
+
+---
+
+## 6. Jalankan Migration
+
+```bash
+php artisan migrate
+```
+
+---
+
+## 7. Jalankan Seeder Admin
+
+```bash
+php artisan db:seed --class=AdminSeeder
+```
+
+---
+
+## 8. Jalankan Server
+
+```bash
+php artisan serve
+```
