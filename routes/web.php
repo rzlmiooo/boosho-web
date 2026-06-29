@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
         Book::findOrFail($id)->delete();
         return back()->with('success', 'Buku berhasil dihapus!');
     });
-
+// anumu
     // ---- FITUR USER: KERANJANG & CHECKOUT ----
     // 1. Tampilkan Halaman Keranjang
     Route::get('/keranjang', function () {
