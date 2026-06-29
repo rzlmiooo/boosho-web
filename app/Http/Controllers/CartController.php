@@ -12,17 +12,14 @@ class CartController extends Controller
     // Fungsi untuk memproses tombol + Keranjang
     public function store($id)
     {
-        // 1. Cek apakah buku dengan ID tersebut ada
         $book = Book::findOrFail($id);
 
-        // 2. Simpan data ke tabel carts (sesuai ERD Anda)
         Cart::create([
             'user_id' => Auth::id(),
             'book_id' => $book->id,
             'quantity' => 1 // Default jumlah 1
         ]);
 
-        // 3. Pindahkan (redirect) user ke halaman keranjang
         return redirect('/keranjang')->with('success', 'Buku berhasil dimasukkan ke keranjang!');
     }
 

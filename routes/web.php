@@ -25,9 +25,47 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('previewBooks'));
     })->name('dashboard');
 
-    Route::get('/katalog', function () {
-        $books = Book::latest()->get();
-        return view('katalog', compact('books'));
+    Route::get('/katalog', function (Request $request) {
+        $query = Book::query();
+
+        // Filter: Pencarian keyword (judul atau penulis)
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', '%' . $keyword . '%')
+                  ->orWhere('author', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        // Filter: Harga minimum
+        if ($request->filled('min_price') && is_numeric($request->min_price)) {
+            $query->where('price', '>=', (int) $request->min_price);
+        }
+
+        // Filter: Harga maksimum
+        if ($request->filled('max_price') && is_numeric($request->max_price)) {
+            $query->where('price', '<=', (int) $request->max_price);
+        }
+
+        // Filter: Hanya tampilkan buku yang masih ada stok
+        if ($request->boolean('in_stock')) {
+            $query->where('stock', '>', 0);
+        }
+
+        // Pengurutan
+        $sort = $request->get('sort', 'latest');
+        match ($sort) {
+            'price_asc'  => $query->orderBy('price', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc'),
+            'title_asc'  => $query->orderBy('title', 'asc'),
+            default      => $query->latest(),
+        };
+
+        $books        = $query->get();
+        $totalBooks   = Book::count(); // total semua buku di DB
+        $activeFilter = $request->filled('search') || $request->filled('min_price') || $request->filled('max_price') || $request->boolean('in_stock') || ($sort !== 'latest');
+
+        return view('katalog', compact('books', 'totalBooks', 'activeFilter'));
     })->name('katalog');
 
     // ---- CRUD BUKU ADMIN ----
