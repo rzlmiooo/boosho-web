@@ -15,16 +15,18 @@
         <div class="flex items-center gap-6">
             <h1 class="text-2xl font-bold text-blue-600 ml-4">BooSho.</h1>
             <div class="hidden md:flex gap-4">
-                <a href="{{ route('dashboard') }}" class="font-semibold text-gray-500 hover:text-blue-600 transition">Dashboard</a>
-                <a href="{{ route('katalog') }}" class="font-semibold text-blue-600 border-b-2 border-blue-600 pb-1">Katalog Buku</a>
+                <a href="{{ route('dashboard') }}" class="font-semibold {{ Route::is('dashboard') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-500 hover:text-blue-600 transition' }}">Dashboard</a>
+                <a href="{{ route('katalog') }}" class="font-semibold {{ Route::is('katalog') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-500 hover:text-blue-600 transition' }}">Katalog Buku</a>
                 
-                @if(!Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="font-semibold text-gray-500 hover:text-blue-600 transition">🛒 Keranjang</a>
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('admin.orders') }}" class="font-semibold {{ Route::is('admin.orders') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-500 hover:text-blue-600 transition' }}">📦 Daftar Pembelian</a>
+                @else
+                    <a href="{{ route('keranjang') }}" class="font-semibold {{ Route::is('keranjang') ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-500 hover:text-blue-600 transition' }}">🛒 Keranjang</a>
                 @endif
             </div>
         </div>
         <div class="mr-4 flex items-center gap-4">
-            <span class="font-semibold text-gray-600">Halo, {{ Auth::user()->name }}</span>
+            <span class="font-semibold text-gray-600">Halo, {{ Auth::user()->name }} <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full ml-1">{{ Auth::user()->role }}</span></span>
             <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                 @csrf
                 <button type="button" onclick="konfirmasiLogout()" class="text-red-500 font-semibold hover:text-red-700 transition">Logout</button>
