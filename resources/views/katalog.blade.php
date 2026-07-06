@@ -73,10 +73,13 @@
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">Dashboard</a>
-                <a href="{{ route('katalog') }}" class="font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 text-sm">Katalog Buku</a>
-                @if(!Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">🛒 Keranjang</a>
+                <a href="{{ route('dashboard') }}" class="text-sm {{ Route::is('dashboard') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Dashboard</a>
+                <a href="{{ route('katalog') }}" class="text-sm {{ Route::is('katalog') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Katalog Buku</a>
+                
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('admin.orders') }}" class="text-sm {{ Route::is('admin.orders') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">📦 Daftar Pembelian</a>
+                @else
+                    <a href="{{ route('keranjang') }}" class="text-sm {{ Route::is('keranjang') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">🛒 Keranjang</a>
                 @endif
             </div>
         </div>
