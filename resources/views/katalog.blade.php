@@ -19,6 +19,8 @@
         /* Filter sidebar */
         .filter-card {
             background: white; border-radius: 16px;
+            background: white;
+            border-radius: 16px;
             border: 1px solid #e0e7ff;
             box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07);
         }
@@ -29,6 +31,8 @@
         }
         .book-card:hover {
             transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
         }
 
         /* Price range input */
@@ -75,6 +79,13 @@
                 <a href="{{ route('katalog') }}" class="font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 text-sm">Katalog Buku</a>
                 @if(!Auth::user()->isAdmin())
                     <a href="{{ route('keranjang') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">🛒 Keranjang</a>
+                <a href="{{ route('dashboard') }}" class="text-sm {{ Route::is('dashboard') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Dashboard</a>
+                <a href="{{ route('katalog') }}" class="text-sm {{ Route::is('katalog') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Katalog Buku</a>
+                
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('admin.orders') }}" class="text-sm {{ Route::is('admin.orders') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">📦 Daftar Pembelian</a>
+                @else
+                    <a href="{{ route('keranjang') }}" class="text-sm {{ Route::is('keranjang') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">🛒 Keranjang</a>
                 @endif
             </div>
         </div>
@@ -284,6 +295,7 @@
                                     </svg>
                                     Reset Semua
                                  </a>
+                                </a>
                             </div>
                         @endif
 
@@ -314,6 +326,10 @@
                                 <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
                                     {{-- Icon buku dekoratif --}}
                                      <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
+                                @foreach($books as $book)
+                                <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+                                    {{-- Icon buku dekoratif --}}
+                                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
                                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                         </svg>
@@ -427,6 +443,11 @@
                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
+                    <input type="text" name="author" required placeholder="Masukkan nama penulis..."
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                </div>
                 <div class="mb-5 flex gap-4">
                     <div class="w-1/2">
                         <label class="block text-sm font-semibold mb-1.5 text-gray-700">Harga (Rp)</label>
@@ -523,6 +544,12 @@
             if (e.target === this) tutupModal();
         });
 
+
+        // Tutup modal jika klik di luar
+        document.getElementById('modalTambah')?.addEventListener('click', function(e) {
+            if (e.target === this) tutupModal();
+        });
+
         // ---- Konfirmasi hapus buku ----
         function konfirmasiHapus(id) {
             Swal.fire({
@@ -579,6 +606,7 @@
         const toggleTrack    = document.getElementById('toggle-track');
         const toggleThumb    = document.getElementById('toggle-thumb');
         
+
         if (toggleCheckbox) {
             toggleCheckbox.addEventListener('change', function() {
                 if (this.checked) {
