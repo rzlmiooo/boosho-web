@@ -73,18 +73,51 @@ Route::middleware('auth')->group(function () {
     })->name('katalog');
 
     // ---- CRUD BUKU ADMIN ----
+    // Tambah Buku
     Route::post('/books', function (Request $request) {
         if(Auth::user()->role !== 'admin') abort(403);
-        $validated = $request->validate(['title' => 'required', 'author' => 'required', 'price' => 'required|integer', 'stock' => 'required|integer']);
+        $validated = $request->validate(['title' => 'required', 
+        'author' => 
+        'required', 
+        'price' => 'required|integer', 
+        'stock' => 'required|integer',
+        'description' => 'nullable'
+        ]);
         Book::create($validated);
         return back()->with('success', 'Buku baru berhasil ditambahkan!');
     });
-
+    
+    // Delete Buku
     Route::delete('/books/{id}', function ($id) {
         if(Auth::user()->role !== 'admin') abort(403);
         Book::findOrFail($id)->delete();
         return back()->with('success', 'Buku berhasil dihapus!');
     });
+
+    // Edit Buku
+    Route::get('/books/{id}/edit', function ($id) {
+        if(Auth::user()->role !== 'admin') abort(403);
+        
+        $book = Book::findOrFail($id);
+        return view('form-edit', compact('book')); 
+    });
+
+    // Update Data Buku di database
+    Route::put('/books/{id}', function (Request $request, $id) {
+        if(Auth::user()->role !== 'admin') abort(403);
+        
+        $validated = $request->validate([
+            'title' => 'required', 
+            'author' => 'required', 
+            'price' => 'required|integer', 
+            'stock' => 'required|integer',
+            'description' => 'nullable'
+        ]);
+
+        Book::findOrFail($id)->update($validated);
+        return redirect('/katalog')->with('success', 'Buku berhasil diperbarui!');
+    });
+
 // anumu
     // ---- FITUR USER: KERANJANG & CHECKOUT ----
     // 1. Tampilkan Halaman Keranjang

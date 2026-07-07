@@ -18,6 +18,7 @@
 
         /* Filter sidebar */
         .filter-card {
+            background: white; border-radius: 16px;
             background: white;
             border-radius: 16px;
             border: 1px solid #e0e7ff;
@@ -29,6 +30,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .book-card:hover {
+            transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
         }
@@ -73,6 +75,10 @@
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
+                <a href="{{ route('dashboard') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">Dashboard</a>
+                <a href="{{ route('katalog') }}" class="font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 text-sm">Katalog Buku</a>
+                @if(!Auth::user()->isAdmin())
+                    <a href="{{ route('keranjang') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">🛒 Keranjang</a>
                 <a href="{{ route('dashboard') }}" class="text-sm {{ Route::is('dashboard') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Dashboard</a>
                 <a href="{{ route('katalog') }}" class="text-sm {{ Route::is('katalog') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Katalog Buku</a>
                 
@@ -288,6 +294,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4l16 16M4 20L20 4"/>
                                     </svg>
                                     Reset Semua
+                                 </a>
                                 </a>
                             </div>
                         @endif
@@ -315,6 +322,10 @@
                             </div>
                         @else
                             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5" id="book-grid">
+                                 @foreach($books as $book)
+                                <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+                                    {{-- Icon buku dekoratif --}}
+                                     <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
                                 @foreach($books as $book)
                                 <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
                                     {{-- Icon buku dekoratif --}}
@@ -419,6 +430,19 @@
                     <input type="text" name="title" required placeholder="Masukkan judul buku..."
                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                 </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Buku (Opsional)</label>
+                    <textarea name="description" rows="4" placeholder="Masukkan sinopsis atau deskripsi singkat buku..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800"></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
+                    <input type="text" name="author" required placeholder="Masukkan nama penulis..."
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                </div>
+
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
                     <input type="text" name="author" required placeholder="Masukkan nama penulis..."
@@ -436,6 +460,7 @@
                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                     </div>
                 </div>
+
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="tutupModal()"
                         class="px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-200 transition">
@@ -451,6 +476,55 @@
     </div>
     @endif
 
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+
+    @foreach ($books as $book)
+    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+        
+        <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+
+        <div class="p-5 flex-grow flex flex-col">
+            <h3 class="text-lg font-bold text-gray-800 line-clamp-1">{{ $book->title }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ $book->author }}</p>
+            
+            <div class="mt-3 flex justify-between items-center">
+                <span class="text-blue-600 font-extrabold text-lg">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                <span class="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Stok: {{ $book->stock }}</span>
+            </div>
+
+            <p class="text-gray-600 text-sm mt-3 line-clamp-2">{{ $book->description }}</p>
+        </div>
+
+        <div class="p-5 pt-0 mt-auto">
+                @if(Auth::user()->role === 'admin')
+                    <div class="flex space-x-2">
+                        <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded transition">Edit</a>
+                        <form action="/books/{{ $book->id }}" method="POST" class="w-1/2" id="form-hapus-{{ $book->id }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <form action="/cart/{{ $book->id }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition flex justify-center items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            Ke Keranjang
+                        </button>
+                    </form>
+                @endif
+            </div>
+
+        </div>
+        @endforeach
+
+    </div>
+
     {{-- ===== JAVASCRIPT ===== --}}
     <script>
         // ---- SweetAlert notifications ----
@@ -464,6 +538,12 @@
         // ---- Modal ----
         function bukaModal() { document.getElementById('modalTambah').classList.remove('hidden'); document.getElementById('modalTambah').classList.add('flex'); }
         function tutupModal() { document.getElementById('modalTambah').classList.add('hidden'); document.getElementById('modalTambah').classList.remove('flex'); }
+
+        // Tutup modal jika klik di luar
+        document.getElementById('modalTambah')?.addEventListener('click', function(e) {
+            if (e.target === this) tutupModal();
+        });
+
 
         // Tutup modal jika klik di luar
         document.getElementById('modalTambah')?.addEventListener('click', function(e) {
@@ -525,6 +605,7 @@
         const toggleCheckbox = document.getElementById('in_stock');
         const toggleTrack    = document.getElementById('toggle-track');
         const toggleThumb    = document.getElementById('toggle-thumb');
+        
 
         if (toggleCheckbox) {
             toggleCheckbox.addEventListener('change', function() {

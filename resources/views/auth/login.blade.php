@@ -39,7 +39,15 @@
                 Belum punya akun? <a href="{{ url('/register') }}" class="text-blue-600 font-semibold hover:underline">Daftar disini</a>
             </div>
         </form>
-    </div>
+
+        <div class="mt-6 border-t border-gray-100 pt-4 flex justify-center">
+            <a href="{{ url('/') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Kembali ke Beranda
+            </a>
+        </div>
 
     <script>
         @if(session('error'))
