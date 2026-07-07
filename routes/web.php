@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminBookController;
 use App\Models\Book;
-use App\Models\Cart; // Tambahkan ini
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -22,41 +23,48 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    
+
     Route::get('/dashboard', function () {
-        $books = Book::latest()->get();
-        $orders = Order::with('items.book')->where('user_id', Auth::id())->latest()->get();
-        return view('dashboard', compact('books', 'orders'));
+        if (Auth::user()->isAdmin()) {
+            $totalBooks = Book::count();
+            $totalStock = Book::sum('stock');
+            // Menghitung total nilai secara manual atau via raw query
+            $totalValue = Book::sum(DB::raw('price * stock'));
+
+            $latestBooks = Book::latest()->take(5)->get();
+
+            return view('admin.dashboard', compact('totalBooks', 'totalStock', 'totalValue', 'latestBooks'));
+        } else {
+            $books = Book::latest()->get();
+            $orders = Order::with('items.book')->where('user_id', Auth::id())->latest()->get();
+            return view('dashboard', compact('books', 'orders'));
+        }
     })->name('dashboard');
 
+    // Katalog untuk User
     Route::get('/katalog', function (Request $request) {
         $query = Book::query();
 
-        // Filter: Pencarian keyword (judul atau penulis)
         if ($request->filled('search')) {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', '%' . $keyword . '%')
-                  ->orWhere('author', 'like', '%' . $keyword . '%');
+                    ->orWhere('author', 'like', '%' . $keyword . '%');
             });
         }
 
-        // Filter: Harga minimum
         if ($request->filled('min_price') && is_numeric($request->min_price)) {
             $query->where('price', '>=', (int) $request->min_price);
         }
 
-        // Filter: Harga maksimum
         if ($request->filled('max_price') && is_numeric($request->max_price)) {
             $query->where('price', '<=', (int) $request->max_price);
         }
 
-        // Filter: Hanya tampilkan buku yang masih ada stok
         if ($request->boolean('in_stock')) {
             $query->where('stock', '>', 0);
         }
 
-        // Pengurutan
         $sort = $request->get('sort', 'latest');
         match ($sort) {
             'price_asc'  => $query->orderBy('price', 'asc'),
@@ -66,12 +74,13 @@ Route::middleware('auth')->group(function () {
         };
 
         $books        = $query->get();
-        $totalBooks   = Book::count(); // total semua buku di DB
+        $totalBooks   = Book::count();
         $activeFilter = $request->filled('search') || $request->filled('min_price') || $request->filled('max_price') || $request->boolean('in_stock') || ($sort !== 'latest');
 
         return view('katalog', compact('books', 'totalBooks', 'activeFilter'));
     })->name('katalog');
 
+<<<<<<< Updated upstream
     // ---- CRUD BUKU ADMIN ----
     // Tambah Buku
     Route::post('/books', function (Request $request) {
@@ -119,18 +128,62 @@ Route::middleware('auth')->group(function () {
     });
 
 // anumu
+=======
+    // Rute Admin Books Baru menggunakan Controller
+    Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->prefix('admin/books')->name('admin.books.')->group(function () {
+        Route::get('/', [AdminBookController::class, 'index'])->name('index');
+        Route::get('/create', [AdminBookController::class, 'create'])->name('create');
+        Route::post('/', [AdminBookController::class, 'store'])->name('store');
+        Route::get('/{id}', [AdminBookController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AdminBookController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminBookController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminBookController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rute Legacy (untuk menjaga route agar tidak error jika ada view yang masih mereferensikannya)
+    Route::post('/books', function(Request $request) {
+        if(!Auth::user()->isAdmin()) abort(403);
+        // ... kode legacy atau arahkan ke admin.books.store
+        return redirect()->route('admin.books.store')->withInput();
+    });
+
+    Route::delete('/books/{id}', function($id) {
+         if(!Auth::user()->isAdmin()) abort(403);
+         return redirect()->route('admin.books.destroy', $id);
+    });
+
+    Route::get('/books/{id}', function ($id) {
+        $book = Book::findOrFail($id);
+        return view('detail', compact('book'));
+    })->name('book.detail');
+
+    Route::get('/books/{id}/edit', function($id) {
+         if(!Auth::user()->isAdmin()) abort(403);
+         return redirect()->route('admin.books.edit', $id);
+    })->name('book.edit');
+
+    Route::put('/books/{id}', function(Request $request, $id) {
+        if(!Auth::user()->isAdmin()) abort(403);
+        // ... kode legacy
+        return redirect()->route('admin.books.update', $id);
+    });
+
+>>>>>>> Stashed changes
     // ---- FITUR USER: KERANJANG & CHECKOUT ----
-    // 1. Tampilkan Halaman Keranjang
+    Route::get('/account', function () {
+        $orders = Order::with('items.book')->where('user_id', Auth::id())->latest()->get();
+        return view('account', compact('orders'));
+    })->name('account');
+
     Route::get('/keranjang', function () {
-        if(Auth::user()->isAdmin()) abort(403); // Admin tidak punya keranjang
+        if(Auth::user()->isAdmin()) abort(403);
         $carts = Cart::with('book')->where('user_id', Auth::id())->get();
         return view('keranjang', compact('carts'));
     })->name('keranjang');
 
-    // 2. Tambah Buku ke Keranjang dengan quantity khusus
     Route::post('/cart/{book_id}', function (Request $request, $book_id) {
         if(Auth::user()->isAdmin()) abort(403);
-        
+
         $book = Book::findOrFail($book_id);
         $qty = intval($request->input('quantity', 1));
         if ($qty < 1) $qty = 1;
@@ -152,20 +205,18 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', 'Buku dimasukkan ke keranjang!');
     });
 
-    // 3. Hapus dari keranjang
     Route::delete('/cart/{id}', function ($id) {
         Cart::where('id', $id)->where('user_id', Auth::id())->delete();
         return back()->with('success', 'Dihapus dari keranjang.');
     });
 
-    // 3.1 Update Kuantitas Keranjang
     Route::post('/cart/{id}/update', function (Request $request, $id) {
         if(Auth::user()->isAdmin()) abort(403);
-        
+
         $cart = Cart::with('book')->where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $action = $request->input('action');
         $quantity = $request->input('quantity');
-        
+
         $book = $cart->book;
         $newQty = $cart->quantity;
 
@@ -190,12 +241,10 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', 'Kuantitas keranjang berhasil diperbarui.');
     });
 
-    // 4. Proses Pembelian (Checkout)
     Route::post('/checkout', function () {
         $carts = Cart::with('book')->where('user_id', Auth::id())->get();
         if($carts->isEmpty()) return back()->with('error', 'Keranjang Anda kosong.');
 
-        // Validasi stok sebelum mulai transaksi
         foreach($carts as $cart) {
             if($cart->book->stock < $cart->quantity) {
                 return back()->with('error', 'Stok buku "' . $cart->book->title . '" tidak mencukupi untuk pesanan Anda.');
@@ -204,14 +253,11 @@ Route::middleware('auth')->group(function () {
 
         try {
             DB::beginTransaction();
-
-            // Hitung total harga
             $totalHarga = 0;
             foreach($carts as $cart) {
                 $totalHarga += $cart->book->price * $cart->quantity;
             }
 
-            // Buat order utama (status: pending, menanti kode dari admin)
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_price' => $totalHarga,
@@ -219,7 +265,6 @@ Route::middleware('auth')->group(function () {
                 'payment_code' => null
             ]);
 
-            // Simpan detail item dan kurangi stok
             foreach($carts as $cart) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -227,13 +272,10 @@ Route::middleware('auth')->group(function () {
                     'quantity' => $cart->quantity,
                     'price' => $cart->book->price
                 ]);
-
                 $cart->book->decrement('stock', $cart->quantity);
             }
 
-            // Hapus isi keranjang setelah sukses beli
             Cart::where('user_id', Auth::id())->delete();
-
             DB::commit();
             return redirect()->route('dashboard')->with('success', 'Checkout berhasil! Mohon tunggu Kode Pembayaran dari Admin.');
         } catch (\Exception $e) {
@@ -242,42 +284,32 @@ Route::middleware('auth')->group(function () {
         }
     });
 
-    // 5. Admin Input Kode Pembayaran
     Route::post('/admin/orders/{id}/assign-code', function (Request $request, $id) {
         if(!Auth::user()->isAdmin()) abort(403);
-
         $validated = $request->validate([
             'payment_code' => 'required|string|max:100'
         ]);
-
         $order = Order::findOrFail($id);
         $order->update([
             'payment_code' => $validated['payment_code'],
             'status' => 'waiting_payment'
         ]);
-
         return back()->with('success', 'Kode pembayaran berhasil diberikan ke user!');
     });
 
-    // 6. User Melakukan Pembayaran (Simulasi)
     Route::post('/orders/{id}/pay', function ($id) {
         $order = Order::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-
         if ($order->status !== 'waiting_payment') {
             return back()->with('error', 'Pesanan tidak dalam status menunggu pembayaran.');
         }
-
-        $order->update([
-            'status' => 'completed'
-        ]);
-
+        $order->update(['status' => 'completed']);
         return back()->with('success', 'Pembayaran berhasil dikonfirmasi! Pesanan Anda telah selesai.');
     });
 
-    // ---- FITUR ADMIN: RIWAYAT PEMBELIAN ----
     Route::get('/admin/pembelian', function () {
         if(!Auth::user()->isAdmin()) abort(403);
         $orders = Order::with(['user', 'items.book'])->latest()->get();
+        // Cek jika view admin.orders menggunakan layout admin terbaru atau layout lama.
         return view('admin.orders', compact('orders'));
     })->name('admin.orders');
 

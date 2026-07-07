@@ -135,10 +135,10 @@
                                 </div>
                                 <div class="pt-4 border-t border-gray-100 flex flex-col gap-2.5">
                                     <!-- Edit Button -->
-                                    <a href="{{ route('book.edit', $book->id) }}"
-                                        class="block w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-sm rounded-lg transition active:scale-95 shadow-sm text-center">
+                                    <button type="button" onclick="Swal.fire('Fitur Edit', 'Form Edit Buku sedang dalam tahap pengembangan.', 'info')"
+                                        class="w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-sm rounded-lg transition active:scale-95 shadow-sm text-center">
                                         Edit Buku
-                                    </a>
+                                    </button>
 
                                     <!-- Delete Button -->
                                     <form action="/books/{{ $book->id }}" method="POST" id="delete-form-{{ $book->id }}" class="w-full">
@@ -183,11 +183,6 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Penulis</label>
                             <input type="text" name="author" required placeholder="Nama penulis..."
                                 class="w-full border border-gray-300 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Deskripsi Buku</label>
-                            <textarea name="description" required rows="3" placeholder="Masukkan deskripsi singkat buku..."
-                                class="w-full border border-gray-300 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -271,36 +266,6 @@
             </div>
         </div>
         @endif
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-
-        @foreach ($previewBooks as $book)
-        <a href="/katalog" class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
-            
-            <div class="h-40 bg-gray-200 flex items-center justify-center group-hover:bg-gray-300 transition-colors">
-                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-            </div>
-
-            <div class="p-4 flex-grow flex flex-col">
-                <h3 class="text-base font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors">{{ $book->title }}</h3>
-                <p class="text-xs text-gray-500 mt-0.5">{{ $book->author }}</p>
-                
-                <div class="mt-3 flex justify-between items-center">
-                    <span class="text-blue-600 font-extrabold text-sm">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
-                    <span class="text-[10px] font-semibold px-2 py-0.5 bg-green-100 text-green-700 rounded-full">Stok: {{ $book->stock }}</span>
-                </div>
-
-                @if($book->description)
-                    <p class="text-gray-600 text-xs mt-2 line-clamp-2">{{ $book->description }}</p>
-                @endif
-            </div>
-
-        </a>
-        @endforeach
-
     </div>
 
     <script>
