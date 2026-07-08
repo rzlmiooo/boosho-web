@@ -31,15 +31,17 @@ class DatabaseSeeder extends Seeder
         Book::create([
             'title' => 'Struktur Data & Algoritma',
             'author' => 'Budi Santoso',
+            'description' => 'Buku ini membahas konsep dasar struktur data dan algoritma secara komprehensif, cocok untuk pemula.',
             'price' => 85000,
             'stock' => 20,
             'description' => 'Ini buku belajar Struktur Data & Algoritma',
             'genres' => ['Teknologi', 'Edukasi'],
         ]);
-        
+
         Book::create([
             'title' => 'Mastering Laravel 11',
             'author' => 'Eza Developer',
+            'description' => 'Panduan lengkap dan praktis untuk menguasai framework Laravel versi terbaru.',
             'price' => 120000,
             'stock' => 15,
             'description' => 'Ini buku belajar Laravel 11',
