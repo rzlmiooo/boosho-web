@@ -12,6 +12,12 @@ class Book extends Model
         'author',
         'description',
         'price',
-        'stock'
+        'stock',
+        'genres'
+    ];
+
+    // Mengubah data JSON menjadi Array
+    protected $casts = [
+        'genres' => 'array',
     ];
 }

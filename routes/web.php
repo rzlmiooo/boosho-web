@@ -77,7 +77,8 @@ Route::middleware('auth')->group(function () {
         'required', 
         'price' => 'required|integer', 
         'stock' => 'required|integer',
-        'description' => 'nullable'
+        'description' => 'nullable',
+        'genres' => 'nullable|array'
         ]);
         Book::create($validated);
         return back()->with('success', 'Buku baru berhasil ditambahkan!');
@@ -107,7 +108,8 @@ Route::middleware('auth')->group(function () {
             'author' => 'required', 
             'price' => 'required|integer', 
             'stock' => 'required|integer',
-            'description' => 'nullable'
+            'description' => 'nullable',
+            'genres' => 'nullable|array'
         ]);
 
         Book::findOrFail($id)->update($validated);
@@ -145,23 +147,89 @@ Route::middleware('auth')->group(function () {
     });
 
     // 4. Proses Pembelian (Checkout)
-    Route::post('/checkout', function () {
-        $carts = Cart::where('user_id', Auth::id())->get();
-        if($carts->isEmpty()) return back()->with('error', 'Keranjang Anda kosong.');
+    Route::post('/checkout', function (Request $request) {
+        // Validasi data array quantities yang dikirim dari keranjang
+        $request->validate([
+            'quantities' => 'required|array',
+        ]);
 
-        // Kurangi stok buku
-        foreach($carts as $cart) {
-            $book = $cart->book;
-            if($book->stock >= $cart->quantity) {
-                $book->decrement('stock', $cart->quantity);
-            } else {
-                return back()->with('error', 'Stok buku "' . $book->title . '" tidak mencukupi untuk pesanan Anda.');
+        DB::beginTransaction(); 
+
+        try {
+            foreach ($request->quantities as $cartId => $qtyToBuy) {
+                // Cari item keranjangnya
+                $cartItem = App\Models\Cart::findOrFail($cartId);
+                $book = $cartItem->book;
+
+                // Cek sekali lagi di backend (jaga-jaga jika di-hack via Inspect Element)
+                if ($book->stock < $qtyToBuy) {
+                    throw new Exception("Gagal! Stok buku '{$book->title}' tidak mencukupi.");
+                }
+
+                // 1. KURANGI STOK BUKU DI DATABASE
+                $book->decrement('stock', $qtyToBuy);
+
+                // 2. HAPUS BUKU DARI KERANJANG (Karena sudah dicheckout)
+                $cartItem->delete();
             }
-        }
 
-        // Hapus isi keranjang setelah sukses beli
-        Cart::where('user_id', Auth::id())->delete();
-        return redirect('/katalog')->with('success', 'Pembelian berhasil! Terima kasih telah berbelanja di BooSho.');
+
+            DB::commit(); 
+            
+            return redirect('/katalog')->with('success', 'Checkout berhasil! Stok buku otomatis dikurangi.');
+
+        } catch (Exception $e) {
+            // Batalkan semua perubahan jika terjadi error
+            DB::rollBack(); 
+            return back()->with('error', $e->getMessage());
+        }
+    });
+
+    // ---- HALAMAN DETAIL BUKU ----
+    Route::get('/books/{id}', function ($id) {
+        $book = App\Models\Book::findOrFail($id);
+        return view('detail-buku', compact('book')); 
+    });
+
+    // ---- FITUR REVIEW BUKU ----
+    // 1. Menampilkan halaman review (Dengan Fitur Sorting)
+    Route::get('/books/{id}/reviews', function (Request $request, $id) {
+        $book = Book::findOrFail($id);
+        
+        // Cek apakah ada request pengurutan dari URL (?sort=terlama)
+        $sort = $request->query('sort', 'terbaru');
+        
+        $query = App\Models\Review::with('user')->where('book_id', $id);
+        
+        // Logika Sorting
+        if ($sort === 'terlama') {
+            $query->oldest(); // Paling lama di atas
+        } else {
+            $query->latest(); // Paling baru di atas (default)
+        }
+        
+        $reviews = $query->get();
+        return view('reviews', compact('book', 'reviews', 'sort')); 
+    });
+
+    // 2. Memproses form kirim review
+    Route::post('/books/{id}/reviews', function (Request $request, $id) {
+        // Keamanan ekstra: Tolak jika admin memaksa kirim data POST
+        if(Auth::user()->role === 'admin') abort(403, 'Admin tidak boleh menulis ulasan.');
+
+        $request->validate(['rating' => 'required|integer|min:1|max:5', 'comment' => 'required']);
+
+        App\Models\Review::create([
+            'user_id' => Auth::id(), 'book_id' => $id, 'rating' => $request->rating, 'comment' => $request->comment
+        ]);
+        return back()->with('success', 'Ulasan berhasil ditambahkan!');
+    });
+
+    // 3. Hapus Review (KHUSUS ADMIN)
+    Route::delete('/reviews/{id}', function ($id) {
+        if(Auth::user()->role !== 'admin') abort(403);
+        App\Models\Review::findOrFail($id)->delete();
+        return back()->with('success', 'Ulasan berhasil dihapus!');
     });
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

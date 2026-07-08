@@ -10,55 +10,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f0f4ff; }
-/* anune wahyu cilik */
-        /* Search bar glow */
-        #search-input:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        /* Filter sidebar */
-        .filter-card {
-            background: white; border-radius: 16px;
-            border: 1px solid #e0e7ff;
-            box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07);
-        }
-
-        /* Book card hover */
-        .book-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .book-card:hover {
-            transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
-        }
-
-        /* Price range input */
-        input[type="range"] {
-            accent-color: #6366f1;
-        }
-
-        /* Active filter badge */
-        .filter-badge {
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-
-        /* Loading skeleton */
-        @keyframes shimmer {
-            0%   { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
-        }
-        .skeleton {
-            background: linear-gradient(90deg, #e8eaf6 25%, #c5cae9 50%, #e8eaf6 75%);
-            background-size: 800px 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 8px;
-        }
-
-        /* Scrollbar filter sidebar */
+        #search-input:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); }
+        .filter-card { background: white; border-radius: 16px; border: 1px solid #e0e7ff; box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07); }
+        .book-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .book-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15); }
+        input[type="range"] { accent-color: #6366f1; }
+        .filter-badge { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        .skeleton { background: linear-gradient(90deg, #e8eaf6 25%, #c5cae9 50%, #e8eaf6 75%); background-size: 800px 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
         .filter-scroll::-webkit-scrollbar { width: 4px; }
         .filter-scroll::-webkit-scrollbar-track { background: #f0f4ff; }
         .filter-scroll::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
@@ -87,8 +47,7 @@
             </span>
             <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                 @csrf
-                <button type="button" onclick="konfirmasiLogout()"
-                    class="text-sm text-red-500 font-semibold hover:text-red-700 transition px-3 py-1.5 rounded-lg hover:bg-red-50">
+                <button type="button" onclick="konfirmasiLogout()" class="text-sm text-red-500 font-semibold hover:text-red-700 transition px-3 py-1.5 rounded-lg hover:bg-red-50">
                     Logout
                 </button>
             </form>
@@ -103,45 +62,33 @@
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Katalog Buku</h2>
                     <p class="text-sm text-gray-500 mt-0.5">
-                        Menampilkan <span class="font-semibold text-indigo-600">{{ $books->count() }}</span>
-                        dari <span class="font-semibold">{{ $totalBooks }}</span> total buku
+                        Menampilkan <span class="font-semibold text-indigo-600">{{ $books->count() }}</span> dari <span class="font-semibold">{{ $totalBooks }}</span> total buku
                         @if($activeFilter)
                             <span class="ml-2 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">Filter Aktif</span>
                         @endif
                     </p>
                 </div>
                 @if(Auth::user()->isAdmin())
-                    <button onclick="bukaModal()"
-                        class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm font-semibold text-sm flex items-center gap-2">
+                    <button onclick="bukaModal()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm font-semibold text-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Tambah Buku
                     </button>
                 @endif
             </div>
 
-            {{-- Search Bar Utama --}}
+            {{-- FORM FILTER UTAMA (Bungkus pencarian dan sidebar) --}}
             <form id="filter-form" method="GET" action="{{ route('katalog') }}">
+                
                 <div class="relative mb-4">
                     <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input
-                        type="text"
-                        id="search-input"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari judul buku atau nama penulis..."
-                        autocomplete="off"
-                        class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-indigo-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition text-sm shadow-sm"
-                    >
+                    <input type="text" id="search-input" name="search" value="{{ request('search') }}" placeholder="Cari judul buku atau nama penulis..." autocomplete="off" class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-indigo-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition text-sm shadow-sm">
                     @if(request('search'))
-                        <button type="button" onclick="clearSearch()"
-                            class="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-600 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
+                        <button type="button" onclick="clearSearch()" class="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-600 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     @endif
                 </div>
@@ -160,22 +107,18 @@
                                     Filter & Urutan
                                 </h3>
                                 @if($activeFilter)
-                                    <a href="{{ route('katalog') }}"
-                                        class="text-xs text-red-500 hover:text-red-700 font-semibold transition hover:underline">
-                                        Reset
-                                    </a>
+                                    <a href="{{ route('katalog') }}" class="text-xs text-red-500 hover:text-red-700 font-semibold transition hover:underline">Reset</a>
                                 @endif
                             </div>
 
                             {{-- SORT --}}
                             <div class="mb-5">
                                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Urutkan</label>
-                                <select name="sort" onchange="submitFilter()"
-                                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition cursor-pointer">
-                                    <option value="latest"     {{ request('sort', 'latest') === 'latest'     ? 'selected' : '' }}>🕐 Terbaru</option>
-                                    <option value="price_asc"  {{ request('sort') === 'price_asc'            ? 'selected' : '' }}>💰 Harga Terendah</option>
-                                    <option value="price_desc" {{ request('sort') === 'price_desc'           ? 'selected' : '' }}>💎 Harga Tertinggi</option>
-                                    <option value="title_asc"  {{ request('sort') === 'title_asc'            ? 'selected' : '' }}>🔤 Judul A–Z</option>
+                                <select name="sort" onchange="submitFilter()" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition cursor-pointer">
+                                    <option value="latest" {{ request('sort', 'latest') === 'latest' ? 'selected' : '' }}>🕐 Terbaru</option>
+                                    <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>💰 Harga Terendah</option>
+                                    <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>💎 Harga Tertinggi</option>
+                                    <option value="title_asc" {{ request('sort') === 'title_asc' ? 'selected' : '' }}>🔤 Judul A–Z</option>
                                 </select>
                             </div>
 
@@ -187,37 +130,17 @@
                                 <div class="flex gap-2 mb-2">
                                     <div class="w-1/2">
                                         <label class="text-xs text-gray-400 mb-1 block">Minimum</label>
-                                        <input type="number" name="min_price" id="min_price"
-                                            value="{{ request('min_price') }}"
-                                            placeholder="0"
-                                            min="0"
-                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50"
-                                            onchange="submitFilter()">
+                                        <input type="number" name="min_price" id="min_price" value="{{ request('min_price') }}" placeholder="0" min="0" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50" onchange="submitFilter()">
                                     </div>
                                     <div class="w-1/2">
                                         <label class="text-xs text-gray-400 mb-1 block">Maksimum</label>
-                                        <input type="number" name="max_price" id="max_price"
-                                            value="{{ request('max_price') }}"
-                                            placeholder="∞"
-                                            min="0"
-                                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50"
-                                            onchange="submitFilter()">
+                                        <input type="number" name="max_price" id="max_price" value="{{ request('max_price') }}" placeholder="∞" min="0" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50" onchange="submitFilter()">
                                     </div>
                                 </div>
-                                {{-- Quick price buttons --}}
                                 <div class="flex flex-wrap gap-1.5 mt-2">
-                                    <button type="button" onclick="setHarga(0, 50000)"
-                                        class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 0 && request('max_price') == 50000) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">
-                                        &lt; 50rb
-                                    </button>
-                                    <button type="button" onclick="setHarga(50000, 150000)"
-                                        class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 50000 && request('max_price') == 150000) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">
-                                        50–150rb
-                                    </button>
-                                    <button type="button" onclick="setHarga(150000, '')"
-                                        class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 150000 && !request('max_price')) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">
-                                        &gt; 150rb
-                                    </button>
+                                    <button type="button" onclick="setHarga(0, 50000)" class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 0 && request('max_price') == 50000) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">&lt; 50rb</button>
+                                    <button type="button" onclick="setHarga(50000, 150000)" class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 50000 && request('max_price') == 150000) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">50–150rb</button>
+                                    <button type="button" onclick="setHarga(150000, '')" class="text-xs px-2 py-1 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition {{ (request('min_price') == 150000 && !request('max_price')) ? 'bg-indigo-100 font-semibold' : 'bg-white' }}">&gt; 150rb</button>
                                 </div>
                             </div>
 
@@ -228,26 +151,15 @@
                                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Ketersediaan</label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <div class="relative">
-                                        <input type="checkbox" name="in_stock" value="1" id="in_stock"
-                                            {{ request()->boolean('in_stock') ? 'checked' : '' }}
-                                            onchange="submitFilter()"
-                                            class="sr-only">
-                                        <div id="toggle-track"
-                                            class="w-11 h-6 rounded-full transition-colors duration-200 {{ request()->boolean('in_stock') ? 'bg-indigo-500' : 'bg-gray-300' }}">
-                                        </div>
-                                        <div id="toggle-thumb"
-                                            class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {{ request()->boolean('in_stock') ? 'translate-x-5' : 'translate-x-0' }}">
-                                        </div>
+                                        <input type="checkbox" name="in_stock" value="1" id="in_stock" {{ request()->boolean('in_stock') ? 'checked' : '' }} onchange="submitFilter()" class="sr-only">
+                                        <div id="toggle-track" class="w-11 h-6 rounded-full transition-colors duration-200 {{ request()->boolean('in_stock') ? 'bg-indigo-500' : 'bg-gray-300' }}"></div>
+                                        <div id="toggle-thumb" class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {{ request()->boolean('in_stock') ? 'translate-x-5' : 'translate-x-0' }}"></div>
                                     </div>
                                     <span class="text-sm text-gray-700 font-medium group-hover:text-indigo-600 transition">Hanya stok tersedia</span>
                                 </label>
                             </div>
 
-                            {{-- TOMBOL APPLY (Mobile hidden, auto-submit via JS) --}}
-                            <button type="submit"
-                                class="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-700 transition shadow-sm mt-1">
-                                Terapkan Filter
-                            </button>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-700 transition shadow-sm mt-1">Terapkan Filter</button>
                         </div>
                     </aside>
 
@@ -257,9 +169,9 @@
                         {{-- BADGE FILTER AKTIF --}}
                         @php
                             $activeBadges = [];
-                            if(request('search'))     $activeBadges[] = ['label' => 'Keyword: "'.request('search').'"', 'clear_param' => 'search'];
-                            if(request('min_price'))  $activeBadges[] = ['label' => 'Min: Rp '.number_format(request('min_price'),0,',','.'), 'clear_param' => 'min_price'];
-                            if(request('max_price'))  $activeBadges[] = ['label' => 'Max: Rp '.number_format(request('max_price'),0,',','.'), 'clear_param' => 'max_price'];
+                            if(request('search')) $activeBadges[] = ['label' => 'Keyword: "'.request('search').'"', 'clear_param' => 'search'];
+                            if(request('min_price')) $activeBadges[] = ['label' => 'Min: Rp '.number_format(request('min_price'),0,',','.'), 'clear_param' => 'min_price'];
+                            if(request('max_price')) $activeBadges[] = ['label' => 'Max: Rp '.number_format(request('max_price'),0,',','.'), 'clear_param' => 'max_price'];
                             if(request()->boolean('in_stock')) $activeBadges[] = ['label' => 'Stok Tersedia', 'clear_param' => 'in_stock'];
                             if(request('sort') && request('sort') !== 'latest') $activeBadges[] = ['label' => 'Urut: '.request('sort'), 'clear_param' => 'sort'];
                         @endphp
@@ -269,21 +181,15 @@
                                 @foreach($activeBadges as $badge)
                                     <span class="filter-badge inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                                         {{ $badge['label'] }}
-                                        <a href="{{ request()->fullUrlWithQuery([$badge['clear_param'] => null]) }}"
-                                            class="text-indigo-400 hover:text-indigo-700 transition">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
+                                        <a href="{{ request()->fullUrlWithQuery([$badge['clear_param'] => null]) }}" class="text-indigo-400 hover:text-indigo-700 transition">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                         </a>
                                     </span>
                                 @endforeach
-                                <a href="{{ route('katalog') }}"
-                                    class="filter-badge inline-flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 transition">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4l16 16M4 20L20 4"/>
-                                    </svg>
+                                <a href="{{ route('katalog') }}" class="filter-badge inline-flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 transition">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4l16 16M4 20L20 4"/></svg>
                                     Reset Semua
-                                 </a>
+                                </a>
                             </div>
                         @endif
 
@@ -291,9 +197,7 @@
                         @if($books->isEmpty())
                             <div class="flex flex-col items-center justify-center py-20 text-center">
                                 <div class="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mb-5">
-                                    <svg class="w-12 h-12 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
+                                    <svg class="w-12 h-12 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </div>
                                 <h3 class="text-xl font-bold text-gray-700 mb-2">Buku Tidak Ditemukan</h3>
                                 <p class="text-gray-500 text-sm mb-5 max-w-xs">
@@ -303,86 +207,83 @@
                                         Tidak ada buku yang sesuai dengan filter yang kamu pilih.
                                     @endif
                                 </p>
-                                <a href="{{ route('katalog') }}"
-                                    class="px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-sm">
+                                <a href="{{ route('katalog') }}" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-sm">
                                     Lihat Semua Buku
                                 </a>
                             </div>
                         @else
                             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5" id="book-grid">
-                                 @foreach($books as $book)
-                                <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-                                    {{-- Icon buku dekoratif --}}
-                                     <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
-                                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                        </svg>
-                                    </div>
-
-                                    <div class="flex-1">
-                                        <h3 class="font-bold text-base text-gray-800 leading-snug mb-1 line-clamp-2">
-                                            @if(request('search'))
-                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
-                                            @else
-                                                {{ $book->title }}
-                                            @endif
-                                        </h3>
-                                        <p class="text-xs text-indigo-500 font-semibold mb-2">
-                                            @if(request('search'))
-                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
-                                            @else
-                                                {{ $book->author }}
-                                            @endif
-                                        </p>
-                                        @if($book->description)
-                                            <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ $book->description }}</p>
-                                        @endif
-                                    </div>
-
-                                    <div>
-                                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-gray-100">
-                                            <span class="font-bold text-gray-900 text-base">
-                                                Rp {{ number_format($book->price, 0, ',', '.') }}
-                                            </span>
-                                            @if($book->stock > 0)
-                                                <span class="text-xs bg-green-50 text-green-600 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                                                    Stok: {{ $book->stock }}
-                                                </span>
-                                            @else
-                                                <span class="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
-                                                    Habis
-                                                </span>
-                                            @endif
+                                @foreach($books as $book)
+                                <div class="book-card bg-white border border-gray-100 rounded-2xl flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                    
+                                    <a href="/books/{{ $book->id }}" class="block group cursor-pointer flex-1 flex flex-col">
+                                        
+                                        <div class="h-48 bg-gray-200 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                            <svg class="w-14 h-14 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                            </svg>
                                         </div>
 
+                                        <div class="p-5 flex-1 flex flex-col">
+                                            <h3 class="font-bold text-lg text-gray-900 leading-snug mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                                                @if(request('search'))
+                                                    {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
+                                                @else
+                                                    {{ $book->title }}
+                                                @endif
+                                            </h3>
+                                            
+                                            <p class="text-sm text-gray-500 mb-4">
+                                                @if(request('search'))
+                                                    {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
+                                                @else
+                                                    {{ $book->author }}
+                                                @endif
+                                            </p>
+
+                                            <div class="flex items-center justify-between mb-3">
+                                                <span class="font-bold text-blue-600 text-lg">
+                                                    Rp {{ number_format($book->price, 0, ',', '.') }}
+                                                </span>
+                                                @if($book->stock > 0)
+                                                    <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">
+                                                        Stok: {{ $book->stock }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold">
+                                                        Habis
+                                                    </span>
+                                                @endif
+                                            </div>
+
+                                            @if($book->description)
+                                                <p class="text-sm text-gray-600 line-clamp-1">{{ $book->description }}</p>
+                                            @endif
+                                        </div>
+                                    </a>
+
+                                    <div class="p-5 pt-0 mt-auto">
                                         @if(Auth::user()->isAdmin())
-                                            <form action="/books/{{ $book->id }}" method="POST" id="delete-form-{{ $book->id }}">
-                                                @csrf @method('DELETE')
-                                                <button type="button" onclick="konfirmasiHapus({{ $book->id }})"
-                                                    class="w-full text-sm text-red-500 font-semibold hover:bg-red-50 border border-red-200 py-2 rounded-xl transition">
-                                                    🗑 Hapus Buku
+                                            <div class="flex space-x-2">
+                                                <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2.5 px-4 rounded-xl transition text-sm flex justify-center items-center">Edit</a>
+                                                <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-xl transition text-sm">
+                                                    Hapus
                                                 </button>
-                                            </form>
+                                            </div>
                                         @else
                                             @if($book->stock > 0)
-                                                <form action="/cart/{{ $book->id }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="w-full bg-indigo-600 text-white font-semibold text-sm py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm flex items-center justify-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                                        </svg>
-                                                        + Keranjang
-                                                    </button>
-                                                </form>
+                                                <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-blue-600 text-white font-semibold text-sm py-2.5 rounded-xl hover:bg-blue-700 transition shadow-sm flex items-center justify-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                    + Keranjang
+                                                </button>
                                             @else
-                                                <button disabled
-                                                    class="w-full bg-gray-100 text-gray-400 font-semibold text-sm py-2.5 rounded-xl cursor-not-allowed">
+                                                <button disabled class="w-full bg-gray-100 text-gray-400 font-semibold text-sm py-2.5 rounded-xl cursor-not-allowed">
                                                     Stok Habis
                                                 </button>
                                             @endif
                                         @endif
                                     </div>
+
                                 </div>
                                 @endforeach
                             </div>
@@ -390,7 +291,7 @@
 
                     </div>{{-- end flex-1 --}}
                 </div>{{-- end flex gap-6 --}}
-            </form>
+            </form> {{-- END FORM FILTER UTAMA --}}
         </div>
 
     </div>{{-- end max-w container --}}
@@ -402,107 +303,70 @@
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-xl font-bold text-gray-800">Tambah Buku Baru</h3>
                 <button onclick="tutupModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
             <form action="/books" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Judul Buku</label>
-                    <input type="text" name="title" required placeholder="Masukkan judul buku..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                    <input type="text" name="title" required placeholder="Masukkan judul buku..." class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                 </div>
-                
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Buku (Opsional)</label>
-                    <textarea name="description" rows="4" placeholder="Masukkan sinopsis atau deskripsi singkat buku..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800"></textarea>
+                    <textarea name="description" rows="4" placeholder="Masukkan sinopsis atau deskripsi singkat buku..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800"></textarea>
                 </div>
-                
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
-                    <input type="text" name="author" required placeholder="Masukkan nama penulis..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                    <input type="text" name="author" required placeholder="Masukkan nama penulis..." class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                 </div>
-
-                <div class="mb-5 flex gap-4">
+                <div class="mb-5 flex gap-3">
                     <div class="w-1/2">
                         <label class="block text-sm font-semibold mb-1.5 text-gray-700">Harga (Rp)</label>
-                        <input type="number" name="price" required placeholder="Contoh: 75000"
-                            class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                        <input type="number" name="price" required placeholder="Contoh: 75000" class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                     </div>
                     <div class="w-1/2">
                         <label class="block text-sm font-semibold mb-1.5 text-gray-700">Stok</label>
-                        <input type="number" name="stock" required placeholder="Contoh: 20"
-                            class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                        <input type="number" name="stock" required placeholder="Contoh: 20" class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                     </div>
                 </div>
-
+                <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Genre Buku</label>
+                        <div id="genre-badges-tambah" class="flex flex-wrap gap-2 mb-2"></div>
+                        <button type="button" onclick="bukaModalGenre()" class="text-sm text-indigo-600 font-semibold hover:underline">+ Tambah Genre</button>
+                </div>
                 <div class="flex justify-end gap-2">
-                    <button type="button" onclick="tutupModal()"
-                        class="px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-200 transition">
-                        Batal
-                    </button>
-                    <button type="submit"
-                        class="px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-sm">
-                        Simpan Buku
-                    </button>
+                    <button type="button" onclick="tutupModal()" class="px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-200 transition">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-sm">Simpan Buku</button>
                 </div>
             </form>
+            <div id="modal-genre" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center backdrop-blur-sm">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Pilih Genre</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-6 max-h-60 overflow-y-auto">
+                        @php $daftarGenre = ['Fiksi', 'Non-Fiksi', 'Edukasi', 'Novel', 'Sejarah', 'Fantasi', 'Misteri', 'Biografi', 'Romantis', 'Teknologi', 'Sains', 'Agama']; @endphp
+                        @foreach($daftarGenre as $genre)
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" name="genres[]" value="{{ $genre }}" class="genre-cb-tambah w-4 h-4 text-indigo-600 rounded" onchange="updateBadgesTambah()">
+                            <span class="text-sm">{{ $genre }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                    <button type="button" onclick="tutupModalGenre()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg">Selesai</button>
+                </div>
+            </div>
         </div>
     </div>
     @endif
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+    <form id="global-cart-form" method="POST" class="hidden">
+        @csrf
+    </form>
 
-    @foreach ($books as $book)
-    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
-        
-        <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-        </div>
-
-        <div class="p-5 flex-grow flex flex-col">
-            <h3 class="text-lg font-bold text-gray-800 line-clamp-1">{{ $book->title }}</h3>
-            <p class="text-sm text-gray-500 mt-1">{{ $book->author }}</p>
-            
-            <div class="mt-3 flex justify-between items-center">
-                <span class="text-blue-600 font-extrabold text-lg">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
-                <span class="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Stok: {{ $book->stock }}</span>
-            </div>
-
-            <p class="text-gray-600 text-sm mt-3 line-clamp-2">{{ $book->description }}</p>
-        </div>
-
-        <div class="p-5 pt-0 mt-auto">
-                @if(Auth::user()->role === 'admin')
-                    <div class="flex space-x-2">
-                        <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded transition">Edit</a>
-                        <form action="/books/{{ $book->id }}" method="POST" class="w-1/2" id="form-hapus-{{ $book->id }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition">
-                                Hapus
-                            </button>
-                        </form>
-                    </div>
-                @else
-                    <form action="/cart/{{ $book->id }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition flex justify-center items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            Ke Keranjang
-                        </button>
-                    </form>
-                @endif
-            </div>
-
-        </div>
-        @endforeach
-
-    </div>
+    <form id="global-delete-form" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
 
     {{-- ===== JAVASCRIPT ===== --}}
     <script>
@@ -514,16 +378,27 @@
             Swal.fire({ icon: 'error', title: 'Oops...', text: '{{ session("error") }}', confirmButtonColor: '#6366f1' });
         @endif
 
-        // ---- Modal ----
-        function bukaModal() { document.getElementById('modalTambah').classList.remove('hidden'); document.getElementById('modalTambah').classList.add('flex'); }
-        function tutupModal() { document.getElementById('modalTambah').classList.add('hidden'); document.getElementById('modalTambah').classList.remove('flex'); }
-
-        // Tutup modal jika klik di luar
+        // ---- Modal Tambah Buku ----
+        function bukaModal() { 
+            document.getElementById('modalTambah').classList.remove('hidden');
+            document.getElementById('modalTambah').classList.add('flex'); 
+        }
+        function tutupModal() { 
+            document.getElementById('modalTambah').classList.add('hidden'); 
+            document.getElementById('modalTambah').classList.remove('flex');
+        }
         document.getElementById('modalTambah')?.addEventListener('click', function(e) {
             if (e.target === this) tutupModal();
         });
 
-        // ---- Konfirmasi hapus buku ----
+        // ---- FUNGSI TAMBAH KERANJANG ----
+        function tambahKeKeranjang(id) {
+            const form = document.getElementById('global-cart-form');
+            form.action = '/cart/' + id;
+            form.submit();
+        }
+
+        // ---- FUNGSI KONFIRMASI HAPUS BUKU ----
         function konfirmasiHapus(id) {
             Swal.fire({
                 title: 'Hapus Buku?', text: 'Data tidak bisa dikembalikan!',
@@ -531,7 +406,11 @@
                 confirmButtonColor: '#ef4444', cancelButtonColor: '#6366f1',
                 confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) document.getElementById('delete-form-' + id).submit();
+                if (result.isConfirmed) {
+                    const form = document.getElementById('global-delete-form');
+                    form.action = '/books/' + id;
+                    form.submit();
+                }
             });
         }
 
@@ -553,7 +432,7 @@
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 document.getElementById('filter-form').submit();
-            }, 500); // 500ms debounce
+            }, 500); 
         });
 
         // ---- Submit filter otomatis ----
@@ -589,6 +468,26 @@
                     toggleThumb.classList.replace('translate-x-5', 'translate-x-0');
                 }
             });
+        }
+        const modalGenre = document.getElementById('modal-genre');
+        const badgeContainerTambah = document.getElementById('genre-badges-tambah');
+
+        function bukaModalGenre() { modalGenre.classList.remove('hidden'); }
+        function tutupModalGenre() { modalGenre.classList.add('hidden'); }
+
+        function updateBadgesTambah() {
+            badgeContainerTambah.innerHTML = '';
+            document.querySelectorAll('.genre-cb-tambah:checked').forEach(cb => {
+                const badge = document.createElement('span');
+                badge.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 border border-indigo-200';
+                badge.innerHTML = `${cb.value} <button type="button" onclick="hapusGenreTambah('${cb.value}')" class="ml-1.5 text-indigo-400 hover:text-red-500">×</button>`;
+                badgeContainerTambah.appendChild(badge);
+            });
+        }
+
+        function hapusGenreTambah(value) {
+            const checkbox = document.querySelector(`.genre-cb-tambah[value="${value}"]`);
+            if(checkbox) { checkbox.checked = false; updateBadgesTambah(); }
         }
     </script>
 </body>
