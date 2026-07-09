@@ -15,7 +15,12 @@
 </head>
 <body class="text-gray-800">
 
-    <!-- Navigasi -->
+    @php
+        if (!isset($orders)) {
+            $orders = class_exists('\App\Models\Order') ? \App\Models\Order::with('items.book')->where('user_id', Auth::id())->latest()->get() : collect();
+        }
+    @endphp
+
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
@@ -23,15 +28,9 @@
                 <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
-                @if(Auth::check() && Auth::user()->isAdmin())
-                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📦 Daftar Pembelian</a>
-                @elseif(Auth::check())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
-                @endif
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <!-- Profile Dropdown -->
             <div class="relative" x-data="{ open: false }">
                 @if(Auth::check())
                     <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">
@@ -44,7 +43,6 @@
                         </div>
                     </button>
 
-                    <!-- Dropdown Menu -->
                     <div x-show="open"
                          x-transition:enter="transition ease-out duration-100"
                          x-transition:enter-start="transform opacity-0 scale-95"
@@ -62,7 +60,7 @@
 
                         <hr class="border-gray-100 my-1">
 
-                        <form action="/logout" method="POST" class="w-full m-0" id="logout-form">
+                        <form action="{{ route('logout') }}" method="POST" class="w-full m-0" id="logout-form">
                             @csrf
                             <button type="button" onclick="konfirmasiLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -71,18 +69,16 @@
                         </form>
                     </div>
                 @else
-                    <a href="/login" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 transition">Login</a>
+                    <a href="{{ route('login') }}" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 transition">Login</a>
                 @endif
             </div>
         </div>
     </nav>
 
-    <!-- Konten Utama menggunakan AlpineJS untuk Tab Menu -->
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-10" x-data="{ tab: 'profile' }">
 
         <div class="flex flex-col lg:flex-row gap-8">
 
-            <!-- Sidebar Kiri -->
             <div class="w-full lg:w-1/4">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-24">
                     <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex flex-col items-center">
@@ -115,10 +111,8 @@
                 </div>
             </div>
 
-            <!-- Konten Kanan -->
             <div class="w-full lg:w-3/4">
 
-                <!-- Tab: Profile -->
                 <div x-show="tab === 'profile'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-cloak>
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
                         <div class="flex justify-between items-center mb-6">
@@ -175,7 +169,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Pesanan -->
                 <div x-show="tab === 'orders'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-cloak>
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
                         <div class="mb-6">
@@ -186,7 +179,7 @@
                         @if($orders->isEmpty())
                             <div class="text-center py-16 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
                                 <div class="w-20 h-20 bg-white shadow-sm border border-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <span class="text-4xl">📦</span>
+                                    <span class="text-4xl">🛍️</span>
                                 </div>
                                 <h3 class="text-lg font-bold text-gray-700 mb-2">Belum ada riwayat pesanan</h3>
                                 <p class="text-gray-500 text-sm mb-6 max-w-sm mx-auto">Anda belum pernah melakukan transaksi pembelian buku. Yuk, mulai belanja sekarang!</p>
@@ -198,7 +191,6 @@
                             <div class="space-y-4">
                                 @foreach($orders as $order)
                                 <div class="border border-gray-100 rounded-2xl p-5 hover:shadow-md hover:border-blue-100 transition duration-300 bg-white">
-                                    <!-- Header Order -->
                                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-4 border-b border-gray-50 gap-3">
                                         <div>
                                             <span class="font-bold text-sm text-blue-600 block mb-1">Order #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
@@ -227,7 +219,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Item List -->
                                     <div class="flex flex-col gap-3 mb-4">
                                         @foreach($order->items as $item)
                                         <div class="flex justify-between items-center bg-gray-50/50 p-3 rounded-xl border border-gray-50">
@@ -247,7 +238,6 @@
                                         @endforeach
                                     </div>
 
-                                    <!-- Action & Total Area -->
                                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-gray-100 gap-4 bg-gray-50 -mx-5 -mb-5 px-5 py-4 rounded-b-2xl">
 
                                         @if($order->status === 'waiting_payment')
