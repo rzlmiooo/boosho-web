@@ -37,6 +37,8 @@
 
                 @if(!Auth::check() || !Auth::user()->isAdmin())
                     <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                @else
+                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @endif
             </div>
         </div>
@@ -401,7 +403,7 @@
     {{-- ===== MODAL TAMBAH BUKU (Admin) ===== --}}
     @if(Auth::check() && Auth::user()->isAdmin())
     <div id="modalTambah" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-indigo-500 animate-in">
+        <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-lg border-t-4 border-indigo-500 max-h-[90vh] overflow-y-auto animate-in">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-xl font-bold text-gray-800">Tambah Buku Baru</h3>
                 <button onclick="tutupModal()" class="text-gray-400 hover:text-gray-600 transition">
@@ -410,40 +412,70 @@
                     </svg>
                 </button>
             </div>
-            <form action="/books" method="POST">
+            <form action="/books" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Judul Buku</label>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Cover Gambar (Opsional)</label>
+                    <input type="file" name="cover" accept="image/jpeg,image/png,image/jpg"
+                        class="w-full border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Judul Buku <span class="text-red-500">*</span></label>
                     <input type="text" name="title" required placeholder="Masukkan judul buku..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Buku (Opsional)</label>
-                    <textarea name="description" rows="4" placeholder="Masukkan sinopsis atau deskripsi singkat buku..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800"></textarea>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi / Sinopsis <span class="text-red-500">*</span></label>
+                    <textarea name="description" rows="3" required placeholder="Masukkan sinopsis atau deskripsi lengkap buku..."
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:outline-none transition bg-gray-50 text-gray-800"></textarea>
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Nama Penulis <span class="text-red-500">*</span></label>
                     <input type="text" name="author" required placeholder="Masukkan nama penulis..."
-                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                 </div>
 
-                <div class="mb-5 flex gap-4">
-                    <div class="w-1/2">
-                        <label class="block text-sm font-semibold mb-1.5 text-gray-700">Harga (Rp)</label>
-                        <input type="number" name="price" required placeholder="Contoh: 75000"
-                            class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Kategori</label>
+                        <input type="text" name="category" placeholder="Fiksi, Sains, Agama..."
+                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                     </div>
-                    <div class="w-1/2">
-                        <label class="block text-sm font-semibold mb-1.5 text-gray-700">Stok</label>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Stok <span class="text-red-500">*</span></label>
                         <input type="number" name="stock" required placeholder="Contoh: 20"
-                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2">
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Harga (Rp) <span class="text-red-500">*</span></label>
+                    <input type="number" name="price" required placeholder="Contoh: 75000"
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700 font-bold">Genre Buku</label>
+                    <div class="grid grid-cols-3 gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200 max-h-32 overflow-y-auto">
+                        @php 
+                            $daftarGenre = ['Fiksi', 'Non-Fiksi', 'Edukasi', 'Novel', 'Sejarah', 'Fantasi', 'Misteri', 'Biografi', 'Romantis', 'Teknologi', 'Sains', 'Agama'];
+                        @endphp
+                        @foreach($daftarGenre as $genre)
+                        <label class="flex items-center space-x-1.5 cursor-pointer">
+                            <input type="checkbox" name="genres[]" value="{{ $genre }}" 
+                                class="w-3.5 h-3.5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                            <span class="text-xs text-gray-700 font-medium">{{ $genre }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
                     <button type="button" onclick="tutupModal()"
                         class="px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-200 transition">
                         Batal

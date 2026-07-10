@@ -28,7 +28,8 @@ class AdminBookController extends Controller
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'genres' => 'nullable|array'
         ]);
 
         $data = $validated;
@@ -66,7 +67,8 @@ class AdminBookController extends Controller
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'genres' => 'nullable|array'
         ]);
 
         $data = $validated;

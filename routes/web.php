@@ -91,6 +91,15 @@ Route::get('/books/{id}/reviews', function (Request $request, $id) {
 Route::middleware('auth')->group(function () {
     
     Route::get('/dashboard', function () {
+        if (Auth::user()->role === 'admin') {
+            $latestBooks = Book::latest()->take(5)->get();
+            $totalBooks = Book::count();
+            $totalStock = Book::sum('stock');
+            $totalValue = Book::all()->sum(function($book) {
+                return $book->price * $book->stock;
+            });
+            return view('admin.dashboard', compact('latestBooks', 'totalBooks', 'totalStock', 'totalValue'));
+        }
         $previewBooks = Book::latest()->take(4)->get();
         return view('dashboard', compact('previewBooks'));
     })->name('dashboard');
@@ -99,15 +108,24 @@ Route::middleware('auth')->group(function () {
     // Tambah Buku
     Route::post('/books', function (Request $request) {
         if(Auth::user()->role !== 'admin') abort(403);
-        $validated = $request->validate(['title' => 'required', 
-        'author' => 
-        'required', 
-        'price' => 'required|integer', 
-        'stock' => 'required|integer',
-        'description' => 'nullable',
-        'genres' => 'nullable|array'
+        $validated = $request->validate([
+            'title' => 'required', 
+            'author' => 'required', 
+            'category' => 'nullable|string|max:255',
+            'price' => 'required|integer', 
+            'stock' => 'required|integer',
+            'description' => 'required|string',
+            'genres' => 'nullable|array',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
-        Book::create($validated);
+        
+        $data = $validated;
+        if ($request->hasFile('cover')) {
+            $path = $request->file('cover')->store('covers', 'public');
+            $data['cover'] = $path;
+        }
+
+        Book::create($data);
         return back()->with('success', 'Buku baru berhasil ditambahkan!');
     });
     
@@ -133,6 +151,7 @@ Route::middleware('auth')->group(function () {
         $validated = $request->validate([
             'title' => 'required', 
             'author' => 'required', 
+            'category' => 'nullable|string|max:255',
             'price' => 'required|integer', 
             'stock' => 'required|integer',
             'description' => 'nullable',

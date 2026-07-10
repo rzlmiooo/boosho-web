@@ -20,7 +20,7 @@
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
                 @if(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📦 Daftar Pembelian</a>
+                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @else
                     <a href="{{ route('keranjang') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">🛒 Keranjang</a>
                 @endif

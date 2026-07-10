@@ -28,6 +28,12 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800">
             </div>
 
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
+                <input type="text" name="category" value="{{ $book->category }}" placeholder="Fiksi, Edukasi, Bisnis..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800">
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Harga (Rp)</label>
