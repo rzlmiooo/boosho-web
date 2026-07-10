@@ -11,59 +11,15 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f0f4ff; }
-/* anune wahyu cilik */
-        /* Search bar glow */
-        #search-input:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        /* Filter sidebar */
-        .filter-card {
-            background: white; border-radius: 16px;
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e0e7ff;
-            box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07);
-        }
-
-        /* Book card hover */
-        .book-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .book-card:hover {
-            transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
-        }
-
-        /* Price range input */
-        input[type="range"] {
-            accent-color: #6366f1;
-        }
-
-        /* Active filter badge */
-        .filter-badge {
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-
-        /* Loading skeleton */
-        @keyframes shimmer {
-            0%   { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
-        }
-        .skeleton {
-            background: linear-gradient(90deg, #e8eaf6 25%, #c5cae9 50%, #e8eaf6 75%);
-            background-size: 800px 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 8px;
-        }
-
-        /* Scrollbar filter sidebar */
+        #search-input:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); }
+        .filter-card { background: white; border-radius: 16px; border: 1px solid #e0e7ff; box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07); }
+        .book-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .book-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15); }
+        input[type="range"] { accent-color: #6366f1; }
+        .filter-badge { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        .skeleton { background: linear-gradient(90deg, #e8eaf6 25%, #c5cae9 50%, #e8eaf6 75%); background-size: 800px 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
         .filter-scroll::-webkit-scrollbar { width: 4px; }
         .filter-scroll::-webkit-scrollbar-track { background: #f0f4ff; }
         .filter-scroll::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
@@ -71,71 +27,64 @@
 </head>
 <body class="text-gray-800">
 
-    {{-- ===== NAVBAR ===== --}}
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">Dashboard</a>
-                <a href="{{ route('katalog') }}" class="font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 text-sm">Katalog Buku</a>
-                @if(!Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="font-medium text-gray-500 hover:text-indigo-600 transition text-sm">🛒 Keranjang</a>
-                <a href="{{ route('dashboard') }}" class="text-sm {{ Route::is('dashboard') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Dashboard</a>
-                <a href="{{ route('katalog') }}" class="text-sm {{ Route::is('katalog') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">Katalog Buku</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
                 
-                @if(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.orders') }}" class="text-sm {{ Route::is('admin.orders') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">📦 Daftar Pembelian</a>
-                @else
-                    <a href="{{ route('keranjang') }}" class="text-sm {{ Route::is('keranjang') ? 'font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5' : 'font-medium text-gray-500 hover:text-indigo-600 transition' }}">🛒 Keranjang</a>
+                <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
+
+                @if(!Auth::user()->isAdmin())
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
                 @endif
             </div>
         </div>
+        
         <div class="flex items-center gap-4">
-        <!-- Profile Dropdown -->
-        <div class="relative" x-data="{ open: false }">
-            @if(Auth::check())
-                <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">
-                    <span class="text-sm font-semibold text-indigo-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
-                    @if(Auth::user()->isAdmin())
-                        <span class="text-[10px] bg-indigo-200 text-indigo-800 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Admin</span>
-                    @endif
-                    <div class="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    </div>
-                </button>
+            <div class="relative" x-data="{ open: false }">
+                @if(Auth::check())
+                    <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">
+                        <span class="text-sm font-semibold text-indigo-700">{{ explode(' ', Auth::user()->name)[0] }}</span>
+                        @if(Auth::user()->isAdmin())
+                            <span class="text-[10px] bg-indigo-200 text-indigo-800 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Admin</span>
+                        @endif
+                        <div class="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                    </button>
 
-                <!-- Dropdown Menu -->
-                <div x-show="open" 
-                     x-transition:enter="transition ease-out duration-100"
-                     x-transition:enter-start="transform opacity-0 scale-95"
-                     x-transition:enter-end="transform opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-75"
-                     x-transition:leave-start="transform opacity-100 scale-100"
-                     x-transition:leave-end="transform opacity-0 scale-95"
-                     class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50"
-                     style="display: none;">
-                    
-                    <a href="{{ route('account') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        My Account
-                    </a>
-                    
-                    <hr class="border-gray-100 my-1">
-                    
-                    <form action="/logout" method="POST" class="w-full m-0" id="logout-form">
-                        @csrf
-                        <button type="button" onclick="konfirmasiLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            Logout
-                        </button>
-                    </form>
-                </div>
-            @else
-                <a href="/login" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 transition">Login</a>
-            @endif
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50"
+                         style="display: none;">
+                        
+                        <a href="{{ route('account') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            My Account
+                        </a>
+                        
+                        <hr class="border-gray-100 my-1">
+                        
+                        <form action="{{ route('logout') }}" method="POST" class="w-full m-0" id="logout-form">
+                            @csrf
+                            <button type="button" onclick="konfirmasiLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 transition">Login</a>
+                @endif
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <div class="max-w-screen-xl mx-auto px-4 py-8">
 
@@ -285,7 +234,7 @@
                                 </label>
                             </div>
 
-                            {{-- TOMBOL APPLY (Mobile hidden, auto-submit via JS) --}}
+                            {{-- TOMBOL APPLY --}}
                             <button type="submit"
                                 class="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-700 transition shadow-sm mt-1">
                                 Terapkan Filter
@@ -320,12 +269,11 @@
                                     </span>
                                 @endforeach
                                 <a href="{{ route('katalog') }}"
-                                    class="filter-badge inline-flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 transition">
+                                     class="filter-badge inline-flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 transition">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4l16 16M4 20L20 4"/>
                                     </svg>
                                     Reset Semua
-                                 </a>
                                 </a>
                             </div>
                         @endif
@@ -352,87 +300,95 @@
                                 </a>
                             </div>
                         @else
-                            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5" id="book-grid">
-                                 @foreach($books as $book)
-                                <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-                                    {{-- Icon buku dekoratif --}}
-                                     <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
-                                @foreach($books as $book)
-                                <div class="book-card bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-                                    {{-- Icon buku dekoratif --}}
-                                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
-                                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                        </svg>
-                                    </div>
-
-                                    <div class="flex-1">
-                                        <h3 class="font-bold text-base text-gray-800 leading-snug mb-1 line-clamp-2">
-                                            @if(request('search'))
-                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
-                                            @else
-                                                {{ $book->title }}
-                                            @endif
-                                        </h3>
-                                        <p class="text-xs text-indigo-500 font-semibold mb-2">
-                                            @if(request('search'))
-                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
-                                            @else
-                                                {{ $book->author }}
-                                            @endif
-                                        </p>
-                                        @if($book->description)
-                                            <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ $book->description }}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="book-grid">
+                            @foreach($books as $book)
+                            <div class="bg-white border border-gray-100 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition duration-300 group">
+                                
+                                {{-- Bagian Atas: Icon Mini, Judul, Penulis, Deskripsi --}}
+                                <div>
+                                    {{-- Icon Buku / Cover Mini di pojok kiri atas --}}
+                                    <div class="w-12 h-12 bg-indigo-50 rounded-[14px] flex items-center justify-center text-indigo-500 mb-5">
+                                        @if(isset($book->cover) && $book->cover)
+                                            <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover" class="w-full h-full object-cover rounded-[14px]">
+                                        @else
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                            </svg>
                                         @endif
                                     </div>
 
-                                    <div>
-                                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-gray-100">
-                                            <span class="font-bold text-gray-900 text-base">
-                                                Rp {{ number_format($book->price, 0, ',', '.') }}
-                                            </span>
-                                            @if($book->stock > 0)
-                                                <span class="text-xs bg-green-50 text-green-600 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                                                    Stok: {{ $book->stock }}
-                                                </span>
-                                            @else
-                                                <span class="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
-                                                    Habis
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        @if(Auth::user()->isAdmin())
-                                            <form action="/books/{{ $book->id }}" method="POST" id="delete-form-{{ $book->id }}">
-                                                @csrf @method('DELETE')
-                                                <button type="button" onclick="konfirmasiHapus({{ $book->id }})"
-                                                    class="w-full text-sm text-red-500 font-semibold hover:bg-red-50 border border-red-200 py-2 rounded-xl transition">
-                                                    🗑 Hapus Buku
-                                                </button>
-                                            </form>
+                                    <h3 class="font-bold text-xl text-gray-900 leading-snug mb-1 line-clamp-2">
+                                        @if(request('search'))
+                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
                                         @else
+                                            {{ $book->title }}
+                                        @endif
+                                    </h3>
+                                    
+                                    {{-- Nama penulis berwarna ungu/indigo sesuai screenshot --}}
+                                    <p class="text-[15px] font-semibold text-indigo-500 mb-3">
+                                        @if(request('search'))
+                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
+                                        @else
+                                            {{ $book->author }}
+                                        @endif
+                                    </p>
+
+                                    @if($book->description)
+                                        <p class="text-sm text-gray-500 line-clamp-2">
+                                            {{ $book->description }}
+                                        </p>
+                                    @endif
+                                </div>
+
+                                {{-- Bagian Bawah: Harga, Stok, & Tombol --}}
+                                <div class="mt-6">
+                                    {{-- Divider border-t dan layout Harga & Stok --}}
+                                    <div class="border-t border-gray-100 pt-5 mb-5 flex items-center justify-between">
+                                        <span class="font-extrabold text-xl text-gray-900 tracking-tight">
+                                            Rp {{ number_format($book->price, 0, ',', '.') }}
+                                        </span>
+                                        
+                                        @if($book->stock > 0)
+                                            <span class="text-xs bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0] font-bold px-3 py-1.5 rounded-full">
+                                                Stok: {{ $book->stock }}
+                                            </span>
+                                        @else
+                                            <span class="text-xs bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-full">
+                                                Habis
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Susunan Tombol --}}
+                                    @if(Auth::user()->isAdmin())
+                                        <div class="flex gap-2">
+                                            <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-[15px] py-3 rounded-xl transition shadow-sm">Edit</a>
+                                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-[15px] text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-3 rounded-xl transition shadow-sm">Hapus</button>
+                                        </div>
+                                    @else
+                                        <div class="flex flex-col gap-2.5">
+                                            <a href="/books/{{ $book->id }}" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[15px] py-3 rounded-xl transition text-center block shadow-sm border border-indigo-100">
+                                                Detail Buku
+                                            </a>
+                                            
                                             @if($book->stock > 0)
-                                                <form action="/cart/{{ $book->id }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="w-full bg-indigo-600 text-white font-semibold text-sm py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm flex items-center justify-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                                        </svg>
-                                                        + Keranjang
-                                                    </button>
-                                                </form>
+                                                <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[15px] py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                    + Keranjang
+                                                </button>
                                             @else
-                                                <button disabled
-                                                    class="w-full bg-gray-100 text-gray-400 font-semibold text-sm py-2.5 rounded-xl cursor-not-allowed">
+                                                <button disabled class="w-full bg-gray-100 text-gray-400 font-bold text-[15px] py-3 rounded-xl cursor-not-allowed">
                                                     Stok Habis
                                                 </button>
                                             @endif
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
                                 </div>
-                                @endforeach
+                                
                             </div>
+                            @endforeach
+                        </div>
                         @endif
 
                     </div>{{-- end flex-1 --}}
@@ -471,14 +427,9 @@
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
                     <input type="text" name="author" required placeholder="Masukkan nama penulis..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
-                    <input type="text" name="author" required placeholder="Masukkan nama penulis..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
-                </div>
                 <div class="mb-5 flex gap-4">
                     <div class="w-1/2">
                         <label class="block text-sm font-semibold mb-1.5 text-gray-700">Harga (Rp)</label>
@@ -488,7 +439,7 @@
                     <div class="w-1/2">
                         <label class="block text-sm font-semibold mb-1.5 text-gray-700">Stok</label>
                         <input type="number" name="stock" required placeholder="Contoh: 20"
-                            class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
                     </div>
                 </div>
 
@@ -507,54 +458,8 @@
     </div>
     @endif
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-
-    @foreach ($books as $book)
-    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
-        
-        <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-        </div>
-
-        <div class="p-5 flex-grow flex flex-col">
-            <h3 class="text-lg font-bold text-gray-800 line-clamp-1">{{ $book->title }}</h3>
-            <p class="text-sm text-gray-500 mt-1">{{ $book->author }}</p>
-            
-            <div class="mt-3 flex justify-between items-center">
-                <span class="text-blue-600 font-extrabold text-lg">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
-                <span class="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">Stok: {{ $book->stock }}</span>
-            </div>
-
-            <p class="text-gray-600 text-sm mt-3 line-clamp-2">{{ $book->description }}</p>
-        </div>
-
-        <div class="p-5 pt-0 mt-auto">
-                @if(Auth::user()->role === 'admin')
-                    <div class="flex space-x-2">
-                        <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded transition">Edit</a>
-                        <form action="/books/{{ $book->id }}" method="POST" class="w-1/2" id="form-hapus-{{ $book->id }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition">
-                                Hapus
-                            </button>
-                        </form>
-                    </div>
-                @else
-                    <form action="/cart/{{ $book->id }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition flex justify-center items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            Ke Keranjang
-                        </button>
-                    </form>
-                @endif
-            </div>
-
-        </div>
-        @endforeach
-
-    </div>
+    <form id="global-cart-form" method="POST" class="hidden">@csrf</form>
+    <form id="global-delete-form" method="POST" class="hidden">@csrf @method('DELETE')</form>
 
     {{-- ===== JAVASCRIPT ===== --}}
     <script>
@@ -566,22 +471,18 @@
             Swal.fire({ icon: 'error', title: 'Oops...', text: '{{ session("error") }}', confirmButtonColor: '#6366f1' });
         @endif
 
-        // ---- Modal ----
+        // ---- Modal Tambah Buku ----
         function bukaModal() { document.getElementById('modalTambah').classList.remove('hidden'); document.getElementById('modalTambah').classList.add('flex'); }
         function tutupModal() { document.getElementById('modalTambah').classList.add('hidden'); document.getElementById('modalTambah').classList.remove('flex'); }
+        document.getElementById('modalTambah')?.addEventListener('click', function(e) { if (e.target === this) tutupModal(); });
 
-        // Tutup modal jika klik di luar
-        document.getElementById('modalTambah')?.addEventListener('click', function(e) {
-            if (e.target === this) tutupModal();
-        });
+        // ---- Form Global Handlers ----
+        function tambahKeKeranjang(id) {
+            const form = document.getElementById('global-cart-form');
+            form.action = '/cart/' + id;
+            form.submit();
+        }
 
-
-        // Tutup modal jika klik di luar
-        document.getElementById('modalTambah')?.addEventListener('click', function(e) {
-            if (e.target === this) tutupModal();
-        });
-
-        // ---- Konfirmasi hapus buku ----
         function konfirmasiHapus(id) {
             Swal.fire({
                 title: 'Hapus Buku?', text: 'Data tidak bisa dikembalikan!',
@@ -589,7 +490,11 @@
                 confirmButtonColor: '#ef4444', cancelButtonColor: '#6366f1',
                 confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) document.getElementById('delete-form-' + id).submit();
+                if (result.isConfirmed) {
+                    const form = document.getElementById('global-delete-form');
+                    form.action = '/books/' + id;
+                    form.submit();
+                }
             });
         }
 
@@ -615,15 +520,10 @@
         });
 
         // ---- Submit filter otomatis ----
-        function submitFilter() {
-            document.getElementById('filter-form').submit();
-        }
+        function submitFilter() { document.getElementById('filter-form').submit(); }
 
         // ---- Clear search ----
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            document.getElementById('filter-form').submit();
-        }
+        function clearSearch() { document.getElementById('search-input').value = ''; document.getElementById('filter-form').submit(); }
 
         // ---- Quick price range buttons ----
         function setHarga(min, max) {
@@ -636,8 +536,6 @@
         const toggleCheckbox = document.getElementById('in_stock');
         const toggleTrack    = document.getElementById('toggle-track');
         const toggleThumb    = document.getElementById('toggle-thumb');
-        
-
         if (toggleCheckbox) {
             toggleCheckbox.addEventListener('change', function() {
                 if (this.checked) {

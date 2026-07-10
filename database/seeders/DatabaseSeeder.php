@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Administrator BooSho',
             'email' => 'admin@boosho.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('123'),
             'role' => 'admin',
         ]);
 
@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Pengguna Setia',
             'email' => 'user@boosho.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('123'),
             'role' => 'user',
         ]);
 
@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
             'description' => 'Buku ini membahas konsep dasar struktur data dan algoritma secara komprehensif, cocok untuk pemula.',
             'price' => 85000,
             'stock' => 20,
+            'description' => 'Ini buku belajar Struktur Data & Algoritma',
+            'genres' => ['Teknologi', 'Edukasi'],
         ]);
 
         Book::create([
@@ -42,6 +44,8 @@ class DatabaseSeeder extends Seeder
             'description' => 'Panduan lengkap dan praktis untuk menguasai framework Laravel versi terbaru.',
             'price' => 120000,
             'stock' => 15,
+            'description' => 'Ini buku belajar Laravel 11',
+            'genres' => ['Teknologi', 'Edukasi'],
         ]);
     }
 }
