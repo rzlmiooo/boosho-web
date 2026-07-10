@@ -31,11 +31,28 @@
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
                 
-                <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
+                <!-- CATATAN: Untuk file dashboard.blade.php berikan class border-b-2 pada menu Dashboard -->
+                <!-- Untuk file katalog.blade.php berikan class border-b-2 pada menu Katalog Buku -->
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
-                @if(!Auth::user()->isAdmin())
+                @if(Auth::check() && Auth::user()->isAdmin())
+                    @php
+                        // Menghitung jumlah pesanan yang statusnya belum selesai (not completed)
+                        $pendingOrders = class_exists('\App\Models\Order') ? \App\Models\Order::where('status', '!=', 'completed')->count() : 0;
+                    @endphp
+                    
+                    <!-- Link menuju ke halaman account dengan trigger tab admin_orders -->
+                    <a href="{{ route('account') }}?tab=admin_orders" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        📦 Pesanan Masuk
+                        @if($pendingOrders > 0)
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse shadow-sm">
+                                {{ $pendingOrders }}
+                            </span>
+                        @endif
+                    </a>
+                @elseif(Auth::check())
                     <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
                 @endif
             </div>

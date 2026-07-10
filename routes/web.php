@@ -277,23 +277,33 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', 'Ulasan berhasil dihapus!');
     });
 
-    // Accounting
+    // ---- HALAMAN ACCOUNT & RIWAYAT PESANAN ----
     Route::get('/account', function () {
-        // Cek apakah model Order sudah ada, jika ya ambil data pesanan milik user yang login
-        $orders = class_exists('\App\Models\Order') 
-                  ? \App\Models\Order::with('items.book')->where('user_id', Auth::id())->latest()->get() 
-                  : collect(); 
+        if (class_exists('\App\Models\Order')) {
+            if (Auth::user()->role === 'admin') {
+                // Jika ADMIN: Ambil SEMUA data pesanan dari semua user
+                $orders = \App\Models\Order::with(['items.book', 'user'])->latest()->get();
+            } else {
+                // Jika USER BIASA: Hanya ambil pesanannya sendiri
+                $orders = \App\Models\Order::with('items.book')->where('user_id', Auth::id())->latest()->get();
+            }
+        } else {
+            $orders = collect(); 
+        }
                   
         return view('account', compact('orders'));
     })->name('account')->middleware('auth');
 
-    Route::get('/admin/orders', function () {
+    // ---- PROSES KONFIRMASI PESANAN (OLEH ADMIN) ----
+    Route::post('/admin/orders/{id}/confirm', function ($id) {
         if(Auth::user()->role !== 'admin') abort(403);
         
-        // Mengambil semua order beserta item bukunya
-        $orders = App\Models\Order::with('items.book', 'user')->latest()->get();
-        return view('admin-orders', compact('orders'));
-    })->name('admin.orders');
+        $order = \App\Models\Order::findOrFail($id);
+        $order->update(['status' => 'completed']); // Ubah status jadi selesai
+        
+        return back()->with('success', 'Pesanan berhasil dikonfirmasi dan diselesaikan!');
+    });
 
+    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
