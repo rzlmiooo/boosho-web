@@ -48,6 +48,7 @@
                 Kembali ke Beranda
             </a>
         </div>
+    </div>
 
     <script>
         @if(session('error'))

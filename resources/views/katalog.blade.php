@@ -35,7 +35,7 @@
                 
                 <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
 
-                @if(!Auth::user()->isAdmin())
+                @if(!Auth::check() || !Auth::user()->isAdmin())
                     <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
                 @endif
             </div>
@@ -101,7 +101,7 @@
                         @endif
                     </p>
                 </div>
-                @if(Auth::user()->isAdmin())
+                @if(Auth::check() && Auth::user()->isAdmin())
                     <button onclick="bukaModal()"
                         class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm font-semibold text-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -361,7 +361,7 @@
                                     </div>
 
                                     {{-- Susunan Tombol --}}
-                                    @if(Auth::user()->isAdmin())
+                                    @if(Auth::check() && Auth::user()->isAdmin())
                                         <div class="flex gap-2">
                                             <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-[15px] py-3 rounded-xl transition shadow-sm">Edit</a>
                                             <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-[15px] text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-3 rounded-xl transition shadow-sm">Hapus</button>
@@ -399,7 +399,7 @@
     </div>{{-- end max-w container --}}
 
     {{-- ===== MODAL TAMBAH BUKU (Admin) ===== --}}
-    @if(Auth::user()->isAdmin())
+    @if(Auth::check() && Auth::user()->isAdmin())
     <div id="modalTambah" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-indigo-500 animate-in">
             <div class="flex items-center justify-between mb-5">

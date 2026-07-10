@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-500 mt-1">Perbarui informasi katalog buku BooSho di bawah ini.</p>
         </div>
 
-        <form action="/books/{{ $book->id }}" method="POST" class="space-y-5">
+        <form action="/books/{{ $book->id }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT') <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Buku</label>
@@ -46,6 +46,18 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Buku</label>
                 <textarea name="description" rows="4"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800">{{ $book->description }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Ganti Cover Buku (Opsional)</label>
+                <input type="file" name="cover" accept="image/jpeg,image/png,image/jpg"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                @if($book->cover)
+                    <div class="mt-2 text-xs text-gray-500 flex items-center gap-2">
+                        <span>Cover saat ini:</span>
+                        <img src="{{ asset('storage/' . $book->cover) }}" class="w-8 h-12 object-cover rounded shadow-sm">
+                    </div>
+                @endif
             </div>
 
             <!-- Area UI Genre Buku -->

@@ -7,10 +7,18 @@ use App\Http\Controllers\Api\BookController;
 // Route API Search
 Route::get('books/search/{title}', [BookController::class, 'search']);
 
-// Endpoint khusus yang mengarah ke BookController
-Route::apiResource('books', BookController::class);
+// Public routes for reading books
+Route::get('books', [BookController::class, 'index']);
+Route::get('books/{id}', [BookController::class, 'show']);
 
-// (Opsional) Route untuk mendapatkan data user yang sedang login via token
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Protected routes for writing/deleting books
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('books', [BookController::class, 'store']);
+    Route::put('books/{id}', [BookController::class, 'update']);
+    Route::delete('books/{id}', [BookController::class, 'destroy']);
+    
+    // (Opsional) Route untuk mendapatkan data user yang sedang login via token
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});

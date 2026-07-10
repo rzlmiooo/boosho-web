@@ -87,11 +87,6 @@ class AdminBookController extends Controller
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
-
-        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
-            Storage::disk('public')->delete($book->cover);
-        }
-
         $book->delete();
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil dihapus!');
