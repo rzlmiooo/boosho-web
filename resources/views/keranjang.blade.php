@@ -25,7 +25,10 @@
                 @if(Auth::user()->isAdmin())
                     <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @else
-                    <a href="{{ route('keranjang') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @endif
             </div>
         </div>
@@ -87,17 +90,22 @@
             </a>
             <div class="h-5 w-px bg-gray-200"></div>
             <div>
-                <h1 class="text-xl font-bold text-gray-800">🛒 Keranjang Belanja</h1>
+                <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Keranjang Belanja
+                </h1>
             </div>
         </div>
 
         @if($carts->isEmpty())
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
-                <div class="text-5xl mb-4">🛒</div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center flex flex-col items-center justify-center">
+                <div class="text-gray-300 mb-4">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
                 <h3 class="text-lg font-bold text-gray-700 mb-2">Keranjang Masih Kosong</h3>
                 <p class="text-sm text-gray-400 mb-6">Tambahkan buku dari katalog untuk memulai belanja.</p>
                 <a href="{{ route('katalog') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-sm">
-                    📖 Jelajahi Katalog Buku
+                    Jelajahi Katalog Buku
                 </a>
             </div>
 
@@ -355,7 +363,7 @@
             }
 
             Swal.fire({
-                title: '🛒 Konfirmasi Checkout',
+                title: 'Konfirmasi Checkout',
                 text: "Setelah checkout, pesanan akan diproses dan Anda bisa melihatnya di menu 'Pesanan Saya'.",
                 icon: 'info', showCancelButton: true,
                 confirmButtonColor: '#16a34a', cancelButtonColor: '#d33',

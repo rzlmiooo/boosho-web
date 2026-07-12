@@ -53,7 +53,10 @@
                 <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
 
                 @if(!Auth::check() || !Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @else
                     <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @endif
@@ -738,9 +741,6 @@
                                     <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full border border-yellow-200">
                                         ⭐ <span x-text="review.rating + '/5'"></span>
                                     </span>
-                                    <span :class="review.sentiment === 'positif' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide border">
-                                        NLP: <span x-text="review.sentiment"></span>
-                                    </span>
                                 </div>
                             </div>
                             <p class="text-gray-700 text-sm leading-relaxed" x-text="review.comment"></p>
@@ -763,8 +763,8 @@
                 totalReviews: 0,
                 reviews: [],
                 filterRating: 'all',
-                showPositif: true,
-                showKritis: true,
+                showPositif: false,
+                showKritis: false,
                 
                 open(id) {
                     this.isOpen = true;
@@ -774,8 +774,8 @@
                     this.reviews = [];
                     // Reset filters when opening new book
                     this.filterRating = 'all';
-                    this.showPositif = true;
-                    this.showKritis = true;
+                    this.showPositif = false;
+                    this.showKritis = false;
                     
                     fetch('/api/books/' + id + '/reviews')
                         .then(res => res.json())

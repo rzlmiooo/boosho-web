@@ -49,7 +49,10 @@
                 @if(Auth::check() && Auth::user()->isAdmin())
                     <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @elseif(Auth::check())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @endif
             </div>
         </div>
@@ -113,10 +116,16 @@
         </a>
 
         @if(session('success'))
-            <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm">✅ {{ session('success') }}</div>
+            <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ session('success') }}
+            </div>
         @endif
         @if(session('error'))
-            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm">⚠️ {{ session('error') }}</div>
+            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                {{ session('error') }}
+            </div>
         @endif
 
         <!-- Card Container Utama -->
@@ -422,9 +431,6 @@
                                     <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full border border-yellow-200">
                                         ⭐ <span x-text="review.rating + '/5'"></span>
                                     </span>
-                                    <span :class="review.sentiment === 'positif' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide border">
-                                        NLP: <span x-text="review.sentiment"></span>
-                                    </span>
                                 </div>
                             </div>
                             <p class="text-gray-700 text-sm leading-relaxed" x-text="review.comment"></p>
@@ -447,8 +453,8 @@
                 totalReviews: 0,
                 reviews: [],
                 filterRating: 'all',
-                showPositif: true,
-                showKritis: true,
+                showPositif: false,
+                showKritis: false,
                 
                 open(id) {
                     this.isOpen = true;
@@ -458,8 +464,8 @@
                     this.reviews = [];
                     // Reset filters when opening new book
                     this.filterRating = 'all';
-                    this.showPositif = true;
-                    this.showKritis = true;
+                    this.showPositif = false;
+                    this.showKritis = false;
                     
                     fetch('/api/books/' + id + '/reviews')
                         .then(res => res.json())

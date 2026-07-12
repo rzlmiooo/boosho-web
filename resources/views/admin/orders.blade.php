@@ -176,7 +176,8 @@
                         <div class="bg-orange-50/80 border border-orange-200 rounded-xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition group-hover:bg-orange-50">
                             <div class="max-w-md">
                                 <span class="font-bold text-xs text-orange-850 uppercase tracking-wider block mb-1 flex items-center gap-1.5">
-                                    📦 Aksi Admin: Kemas & Kirim Barang
+                                    <svg class="w-4 h-4 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                    Aksi Admin: Kemas & Kirim Barang
                                 </span>
                                 <span class="text-[13px] text-orange-700 block leading-relaxed">Pembayaran telah terkonfirmasi. Input nomor resi pengiriman untuk mengirimkan barang dan memperbarui status pesanan.</span>
                             </div>
@@ -190,7 +191,7 @@
                         <div class="bg-indigo-50/80 border border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-605 flex-shrink-0">
-                                    🚚
+                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 010 2h-1m4-10h4m-4 4h4m-4-4v10M23 14l-3-4h-3v8h1"/></svg>
                                 </div>
                                 <div>
                                     <span class="font-bold text-indigo-805 text-xs block uppercase tracking-wider mb-0.5">Barang Sedang Dikirim</span>

@@ -32,7 +32,10 @@
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
                 @if(Auth::check() && !Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @elseif(Auth::check() && Auth::user()->isAdmin())
                     <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @endif
@@ -265,7 +268,7 @@
                                             <!-- Step 1: Pesanan Dibuat -->
                                             <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step1Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
-                                                    📄
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                                 </div>
                                                 <span class="text-[10px] font-bold mt-2 {{ $step1Active ? 'text-indigo-700' : 'text-gray-400' }}">Dibuat</span>
                                             </div>
@@ -273,7 +276,7 @@
                                             <!-- Step 2: Menunggu Bayar -->
                                             <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step2Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
-                                                    💳
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                                                 </div>
                                                 <span class="text-[10px] font-bold mt-2 {{ $step2Active ? 'text-indigo-700' : 'text-gray-400' }}">Bayar</span>
                                             </div>
@@ -281,7 +284,7 @@
                                             <!-- Step 3: Sedang Dikemas -->
                                             <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step3Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
-                                                    📦
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                                 </div>
                                                 <span class="text-[10px] font-bold mt-2 {{ $step3Active ? 'text-indigo-700' : 'text-gray-400' }}">Dikemas</span>
                                             </div>
@@ -289,7 +292,7 @@
                                             <!-- Step 4: Dalam Pengiriman -->
                                             <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step4Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
-                                                    🚚
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 010 2h-1m4-10h4m-4 4h4m-4-4v10M23 14l-3-4h-3v8h1"/></svg>
                                                 </div>
                                                 <span class="text-[10px] font-bold mt-2 {{ $step4Active ? 'text-indigo-700' : 'text-gray-400' }}">Dikirim</span>
                                             </div>
@@ -297,7 +300,7 @@
                                             <!-- Step 5: Selesai -->
                                             <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step5Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
-                                                    🏁
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                                                 </div>
                                                 <span class="text-[10px] font-bold mt-2 {{ $step5Active ? 'text-indigo-700' : 'text-gray-400' }}">Diterima</span>
                                             </div>
@@ -436,7 +439,7 @@
 
         function konfirmasiTerima(orderId) {
             Swal.fire({
-                title: '📦 Konfirmasi Barang Diterima',
+                title: 'Konfirmasi Barang Diterima',
                 text: "Apakah Anda yakin pesanan telah sampai dan Anda telah menerima barang dengan baik?",
                 icon: 'question', showCancelButton: true,
                 confirmButtonColor: '#4f46e5', cancelButtonColor: '#d33',
