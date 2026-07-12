@@ -1,64 +1,121 @@
-# Web Toko Buku BooSho
+# BooSho
 
-BooSho adalah platform toko buku digital berbasis web yang dikembangkan menggunakan framework Laravel 11. Proyek ini dibangun untuk memenuhi standar arsitektur perangkat lunak yang memisahkan hak akses pengguna (Role-Based Access Control) dan menyediakan jalur RESTful API yang terdokumentasi dengan rapi.
+Web Toko Buku Digital berbasis web yang dikembangkan menggunakan framework Laravel 11. Proyek ini dibangun untuk memenuhi standar arsitektur perangkat lunak yang memisahkan hak akses pengguna (Role-Based Access Control), menyediakan jalur RESTful API yang terdokumentasi dengan rapi, dan menghadirkan pengalaman pengguna yang interaktif dengan integrasi peta digital serta sistem notifikasi.
 
----
-
-## 1. Identitas Developer
-* Nama  : Reza Fairul Nizam
-* NIM   : 2305101022
-
-## 2. Deskripsi & Fitur Aplikasi
-Aplikasi ini membagi sistem menjadi dua antarmuka dan hak akses utama:
-* Fitur Admin: Dapat mengakses antarmuka *Dashboard* untuk melihat pratinjau data, serta halaman *Katalog* untuk melakukan operasi CRUD (Create, Read, Update, Delete) pada data buku secara langsung melalui UI Web.
-* Fitur User: Dapat mendaftar akun baru, *login*, melihat pratinjau buku, memasukkan buku ke dalam Keranjang Belanja, dan melakukan *Checkout* yang akan memotong stok buku di database secara otomatis.
-* Fitur API: Menyediakan 6 *endpoint* RESTful API utama (termasuk fitur pencarian *Search*) yang telah melewati 10 skenario pengujian, baik skenario sukses (*Positive Testing*) maupun skenario validasi *error* (*Negative Testing*).
-* UI/UX: Antarmuka dibangun dengan tampilan bersih menggunakan Tailwind CSS dan dilengkapi notifikasi *pop-up* interaktif dari SweetAlert2.
-
-## 3. Dokumentasi Visual (Screenshot & ERD)
-Berikut adalah tangkapan layar dari rancangan database, antarmuka aplikasi web, dan pengujian API yang telah dilakukan:
-
-### Database Design (ERD)
-![ERD BooSho](documentation/ERD/ERD%20BooSho.png)
-
-### Tampilan Web Aplikasi
-![Halaman Login](documentation/Screenshots/login.png)
-![Dashboard Admin](documentation/Screenshots/dashboard-admin.png)
-![Katalog & Keranjang User](documentation/Screenshots/katalog-user.png)
-![Form Tambah Buku](documentation/Screenshots/form-tambah.png)
-
-### Daftar Endpoint API (Postman)
-Berikut adalah 10 skenario pengujian API yang telah disusun dan diuji melalui Postman:
-### Daftar Endpoint API
-
-| Modul | Method | Endpoint (Route) | Deskripsi & Akses |
-| :--- | :--- | :--- | :--- |
-| **Buku** | GET | `/api/books` | Menampilkan semua data buku di katalog |
-| | GET | `/api/books/{id}` | Menampilkan detail data buku berdasarkan id |
-| | POST | `/api/books` | Menambahkan data buku baru ke katalog |
-| | PUT | `/api/books/{id}` | Update data spesifik buku berdasarkan id |
-| | DELETE | `/api/books/{id}` | Hapus data buku berdasarkan id |
-| | GET | `/api/books/search/{title}`| Melakukan pencarian buku berdasarkan judul |
-| **User** | GET | `/api/user` | Mendapatkan data profil user yang sedang login |
-
-![Daftar Endpoint API](documentation/Screenshots/endpoint-api.png)
-*(Catatan tambahan: File asli hasil Export Collection JSON dari Postman dilampirkan secara lengkap di dalam folder `documentation/Postman API/BooSho API.postman_collection.json` pada repository ini).*
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=black)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 
 ---
 
-## 4. Struktur Folder & Database Migrate
-Sistem ini menggunakan struktur standar Laravel dengan pengorganisasian dokumen pendukung sebagai berikut:
-* File rute logika web UI berada di `routes/web.php`.
-* File rute *backend API* berada di `routes/api.php`.
-* Pengendali utama berada di `app/Http/Controllers/AuthController.php` dan `app/Http/Controllers/Api/BookController.php`.
-* Seluruh *file* tampilan web (`.blade.php`) berada di direktori `resources/views/`.
-* Seluruh berkas dokumentasi (Screenshot, ERD, dan Postman JSON) diletakkan rapi pada sub-folder di dalam direktori `documentation/`.
+## A. Identitas Pengembang
 
-### Status Database (Migration Tersedia)
-Database proyek ini sudah terintegrasi penuh menggunakan sistem *Migration* dari Laravel. File migrasi tabel (`users`, `books`, `carts`) tersedia lengkap di dalam direktori `database/migrations/`.
+**Kelompok 4**
 
-**Cara Melakukan Setup Database:**
-1. Salin `env.example` menjadi `.env` dan konfigurasikan nama database MySQL Anda.
-2. Jalankan perintah ini di terminal untuk mengeksekusi migrasi dan membuat tabel secara otomatis:
-   ```bash
-   php artisan migrate
+* **Ketua**: Rizal Maulana (2305101018)
+* **Anggota**:
+  1. Reza Fairul Nizam (2305101022)
+  2. M. Wahyue Nesaputro (2305102243)
+  3. Sofyan Dwi Saputro (2305101003)
+  4. Rivan Wahyu Mardoni (2305101014)
+
+---
+
+## B. Spesifikasi Teknologi
+
+### Bahasa Pemrograman
+
+- **PHP** (Backend & Framework Engine)
+- **JavaScript** (Interaktivitas Client-Side)
+- **SQL** (Manajemen Database MySQL)
+- **HTML & CSS** (Struktur & Desain UI)
+
+### Framework, Library, & API
+
+- **Framework**: Laravel 11 (MVC PHP Framework)
+- **CSS Utility**: Tailwind CSS (via CDN)
+- **JS Framework**: Alpine.js (State management UI & Dropdown)
+- **Library Peta**: LeafletJS (Peta interaktif OpenStreetMap)
+- **API Geocoding**: OpenStreetMap Nominatim Reverse Geocoding API
+- **Notifikasi**: SweetAlert2 (Pop-up interaktif & konfirmasi)
+- **Database Driver**: Eloquent ORM & Query Builder
+
+---
+
+## C. Fungsi & Fitur Proyek
+
+### 1. Sistem Autentikasi & Otorisasi (RBAC)
+
+- Register akun baru untuk pelanggan.
+- Login dan Logout aman dengan proteksi session.
+- Perbedaan antarmuka dan otorisasi secara ketat antara **Admin** dan **User**.
+
+### 2. Panel Admin (Manajemen Buku & Transaksi)
+
+- **Dashboard Stat**: Melihat total buku, total stok, taksiran nilai aset, dan rilisan buku terbaru.
+- **CRUD Buku**: Menambah, mengubah, dan menghapus buku (termasuk upload cover buku).
+- **Batch Discount**: Menerapkan diskon massal secara terjadwal ke beberapa buku sekaligus.
+- **Manajemen Transaksi**:
+  - Merilis kode pembayaran (Virtual Account) untuk pelanggan yang mengajukan pembelian.
+  - Memproses pengiriman barang dengan menginput nomor resi resmi.
+
+### 3. Panel Pelanggan (User)
+
+- **Katalog Interaktif**: Fitur pencarian buku berdasarkan judul/penulis, filter harga, filter stok, dan pengurutan (harga, terbaru, judul).
+- **Rekomendasi Pintar**: Rekomendasi dinamis berdasarkan 3 kategori/genre buku terakhir yang dilihat oleh user.
+- **Keranjang Belanja**: Menambah kuantitas, mengurangi kuantitas, menghapus item, dan kalkulasi subtotal instan.
+- **Checkout dengan Pinpoint Map**:
+  - Deteksi posisi otomatis pelanggan via **GPS Geolocation API**.
+  - Drop marker / geser pinpoint pada **OpenStreetMap Leaflet** untuk menentukan titik lokasi pengiriman yang akurat.
+  - Mengambil alamat jalan secara otomatis dari koordinat titik peta menggunakan **Nominatim API** untuk mengisi kolom alamat pengiriman secara instan.
+- **Riwayat Transaksi**: Simulasi pembayaran Virtual Account, konfirmasi terima barang, dan pelacakan status pesanan.
+- **Review & Rating Buku**:
+  - Menulis ulasan dan rating 1-5 bintang pada buku yang telah dibeli.
+  - Membaca ulasan dengan analisis sentimen otomatis (Positif & Negatif) dan filter berbasis sentimen.
+
+### 4. Sistem Notifikasi Terintegrasi
+
+- **Navbar Bell Icon Dropdown**: Lonceng notifikasi interaktif yang melacak lencana belum dibaca (*unread count*).
+- **Notifikasi Transaksi**: Status order (Checkout sukses, Kode VA terbit, Pembayaran sukses, Pengiriman resi, Pesanan selesai).
+- **Notifikasi Promo & Rekomendasi**: Broadcast otomatis notifikasi diskon saat admin membuat diskon massal, dan saran buku baru berdasarkan kategori pembelian saat pesanan selesai.
+
+---
+
+## D. Kelebihan Proyek
+
+1. **Akurasi Alamat Pengiriman**: Integrasi LeafletJS + Nominatim API membuat pengisian alamat pengiriman menjadi otomatis dan sangat akurat, meminimalisir kesalahan input manual oleh pembeli.
+2. **Sistem Notifikasi Real-time Client-Side**: Notifikasi dikelola dengan *view composer* global sehingga lonceng notifikasi diperbarui secara mulus di seluruh halaman aplikasi.
+3. **Penyajian Data Responsif**: Desain premium berbasis Tailwind CSS yang responsif untuk perangkat mobile maupun desktop.
+4. **Analisis Sentimen Ulasan**: Mempermudah calon pembeli dalam memilah komentar positif dan negatif dari pembeli sebelumnya.
+
+---
+
+## E. Kekurangan Proyek (Bug/Warning/Limitasi)
+
+1. **Simulasi Transaksi Non-Komersial**: Fitur pembayaran saat ini masih menggunakan skema simulasi perubahan status internal di database (belum dihubungkan ke Payment Gateway pihak ketiga seperti Midtrans/Xendit secara nyata).
+2. **Ketergantungan CDN Eksternal**: File CSS Tailwind, AlpineJS, LeafletJS, dan SweetAlert2 dimuat menggunakan CDN eksternal. Aplikasi memerlukan koneksi internet aktif agar tampilan dan fungsi peta/notifikasi dapat dirender dengan benar.
+3. **Limitasi API Nominatim**: Layanan reverse geocoding OpenStreetMap Nominatim memiliki batas kecepatan (*rate limit*) untuk akses publik. Jika digunakan dalam frekuensi sangat tinggi secara terus-menerus, API dapat mengembalikan respon lambat atau diblokir sementara.
+
+---
+
+## F. Dokumentasi Proyek
+
+### Rancangan ERD Database
+
+`[Tempat ERD Proyek / Placeholder Gambar ERD]`
+
+### Halaman Utama / Katalog Buku
+
+`[Tempat Screenshot Katalog / Placeholder Gambar Katalog]`
+
+### Keranjang Belanja & Fitur Pinpoint Alamat Otomatis
+
+`[Tempat Screenshot Peta Pengiriman / Placeholder Gambar Peta]`
+
+### Dropdown Notifikasi & Dashboard Admin
+
+`[Tempat Screenshot Notifikasi & Admin / Placeholder Gambar Notifikasi]`

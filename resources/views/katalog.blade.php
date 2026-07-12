@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Lengkap - BooSho</title>
+    <title>Katalog Lengkap Buku Digital - BooSho</title>
     <meta name="description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta name="keywords" content="katalog buku, ebook, daftar buku, perpustakaan digital, boosho">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="Katalog Lengkap Buku Digital - BooSho">
+    <meta property="og:description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Katalog Lengkap Buku Digital - BooSho">
+    <meta name="twitter:description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -25,23 +42,31 @@
         .filter-scroll::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></span>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 
                 <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
 
-                @if(!Auth::user()->isAdmin())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                @if(!Auth::check() || !Auth::user()->isAdmin())
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
+                @else
+                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @endif
             </div>
         </div>
         
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+            @if(Auth::check())
+                @include('partials.notification-bell')
+            @endif
             <div class="relative" x-data="{ open: false }">
                 @if(Auth::check())
                     <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">
@@ -92,7 +117,7 @@
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Katalog Buku</h2>
+                    <h1 class="text-2xl font-bold text-gray-800">Katalog Buku</h1>
                     <p class="text-sm text-gray-500 mt-0.5">
                         Menampilkan <span class="font-semibold text-indigo-600">{{ $books->count() }}</span>
                         dari <span class="font-semibold">{{ $totalBooks }}</span> total buku
@@ -101,7 +126,7 @@
                         @endif
                     </p>
                 </div>
-                @if(Auth::user()->isAdmin())
+                @if(Auth::check() && Auth::user()->isAdmin())
                     <button onclick="bukaModal()"
                         class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm font-semibold text-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -302,90 +327,106 @@
                         @else
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="book-grid">
                             @foreach($books as $book)
-                            <div class="bg-white border border-gray-100 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition duration-300 group">
+                            <div onclick="window.location='/books/{{ $book->id }}'" class="cursor-pointer border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden">
                                 
-                                {{-- Bagian Atas: Icon Mini, Judul, Penulis, Deskripsi --}}
-                                <div>
-                                    {{-- Icon Buku / Cover Mini di pojok kiri atas --}}
-                                    <div class="w-12 h-12 bg-indigo-50 rounded-[14px] flex items-center justify-center text-indigo-500 mb-5">
-                                        @if(isset($book->cover) && $book->cover)
-                                            <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover" class="w-full h-full object-cover rounded-[14px]">
-                                        @else
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                {{-- Cover Image Container --}}
+                                <div class="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                                    @if(isset($book->cover) && $book->cover)
+                                        <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover {{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    @else
+                                        <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
+                                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                                             </svg>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
 
-                                    <h3 class="font-bold text-xl text-gray-900 leading-snug mb-1 line-clamp-2">
-                                        @if(request('search'))
-                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
-                                        @else
-                                            {{ $book->title }}
-                                        @endif
-                                    </h3>
-                                    
-                                    {{-- Nama penulis berwarna ungu/indigo sesuai screenshot --}}
-                                    <p class="text-[15px] font-semibold text-indigo-500 mb-3">
-                                        @if(request('search'))
-                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
-                                        @else
-                                            {{ $book->author }}
-                                        @endif
-                                    </p>
-
-                                    @if($book->description)
-                                        <p class="text-sm text-gray-500 line-clamp-2">
-                                            {{ $book->description }}
-                                        </p>
+                                    @if($book->category)
+                                        <span class="absolute top-3 left-3 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                                            {{ $book->category }}
+                                        </span>
                                     @endif
                                 </div>
 
-                                {{-- Bagian Bawah: Harga, Stok, & Tombol --}}
-                                <div class="mt-6">
-                                    {{-- Divider border-t dan layout Harga & Stok --}}
-                                    <div class="border-t border-gray-100 pt-5 mb-5 flex items-center justify-between">
-                                        <span class="font-extrabold text-xl text-gray-900 tracking-tight">
-                                            Rp {{ number_format($book->price, 0, ',', '.') }}
-                                        </span>
+                                {{-- Card Content --}}
+                                <div class="p-5 flex flex-col flex-grow justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-sm leading-snug mb-1 line-clamp-2">
+                                            @if(request('search'))
+                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
+                                            @else
+                                                {{ $book->title }}
+                                            @endif
+                                        </h3>
                                         
-                                        @if($book->stock > 0)
-                                            <span class="text-xs bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0] font-bold px-3 py-1.5 rounded-full">
-                                                Stok: {{ $book->stock }}
-                                            </span>
-                                        @else
-                                            <span class="text-xs bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-full">
-                                                Habis
-                                            </span>
+                                        <p class="text-xs text-gray-400 mb-3">
+                                            @if(request('search'))
+                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
+                                            @else
+                                                {{ $book->author }}
+                                            @endif
+                                        </p>
+
+                                        @if($book->genres)
+                                            <div class="flex flex-wrap gap-1 mb-4">
+                                                @foreach(array_slice($book->genres, 0, 2) as $genre)
+                                                    <span class="text-[9px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full border border-slate-200">
+                                                        {{ $genre }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
 
-                                    {{-- Susunan Tombol --}}
-                                    @if(Auth::user()->isAdmin())
-                                        <div class="flex gap-2">
-                                            <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-[15px] py-3 rounded-xl transition shadow-sm">Edit</a>
-                                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-[15px] text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-3 rounded-xl transition shadow-sm">Hapus</button>
-                                        </div>
-                                    @else
-                                        <div class="flex flex-col gap-2.5">
-                                            <a href="/books/{{ $book->id }}" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[15px] py-3 rounded-xl transition text-center block shadow-sm border border-indigo-100">
-                                                Detail Buku
-                                            </a>
+                                    <div>
+                                        {{-- Price & Rating --}}
+                                        <div class="flex justify-between items-center mb-4">
+                                            <div>
+                                                @if($book->discounted_price < $book->price)
+                                                    <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                                    <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</p>
+                                                @else
+                                                    <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->price, 0, ',', '.') }}</p>
+                                                @endif
+                                            </div>
                                             
-                                            @if($book->stock > 0)
-                                                <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[15px] py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                                    + Keranjang
-                                                </button>
+                                            <button type="button" @click.stop="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
+                                                <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
+                                                <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Action Buttons --}}
+                                        <div class="pt-3 border-t border-gray-100 relative">
+                                            @if(Auth::check() && Auth::user()->isAdmin())
+                                                <div class="flex gap-2">
+                                                    <a href="/books/{{ $book->id }}/edit" onclick="event.stopPropagation()" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-xs py-2 rounded-xl transition shadow-sm">Edit</a>
+                                                    <button type="button" onclick="event.stopPropagation(); konfirmasiHapus({{ $book->id }})" class="w-1/2 text-xs text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-2 rounded-xl transition shadow-sm">Hapus</button>
+                                                </div>
                                             @else
-                                                <button disabled class="w-full bg-gray-100 text-gray-400 font-bold text-[15px] py-3 rounded-xl cursor-not-allowed">
-                                                    Stok Habis
-                                                </button>
+                                                <div class="flex flex-col gap-2">
+                                                    <a href="/books/{{ $book->id }}" onclick="event.stopPropagation()" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
+                                                        Detail Buku
+                                                    </a>
+                                                    @if($book->stock > 0)
+                                                        <button type="button" onclick="event.stopPropagation(); tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                            + Keranjang
+                                                        </button>
+                                                        <div class="absolute -top-2 -right-1 bg-green-100 border border-green-200 text-green-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full shadow-sm">
+                                                            Stok: {{ $book->stock }}
+                                                        </div>
+                                                    @else
+                                                        <button type="button" disabled onclick="event.stopPropagation()" class="w-full bg-gray-100 text-gray-400 font-bold text-xs py-2 rounded-xl cursor-not-allowed border border-gray-200 flex items-center justify-center gap-1.5">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                            Stok Habis
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
                                         </div>
-                                    @endif
+                                    </div>
                                 </div>
-                                
                             </div>
                             @endforeach
                         </div>
@@ -399,9 +440,9 @@
     </div>{{-- end max-w container --}}
 
     {{-- ===== MODAL TAMBAH BUKU (Admin) ===== --}}
-    @if(Auth::user()->isAdmin())
+    @if(Auth::check() && Auth::user()->isAdmin())
     <div id="modalTambah" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-indigo-500 animate-in">
+        <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-lg border-t-4 border-indigo-500 max-h-[90vh] overflow-y-auto animate-in">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-xl font-bold text-gray-800">Tambah Buku Baru</h3>
                 <button onclick="tutupModal()" class="text-gray-400 hover:text-gray-600 transition">
@@ -410,40 +451,70 @@
                     </svg>
                 </button>
             </div>
-            <form action="/books" method="POST">
+            <form action="/books" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Judul Buku</label>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Cover Gambar (Opsional)</label>
+                    <input type="file" name="cover" accept="image/jpeg,image/png,image/jpg"
+                        class="w-full border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Judul Buku <span class="text-red-500">*</span></label>
                     <input type="text" name="title" required placeholder="Masukkan judul buku..."
-                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Buku (Opsional)</label>
-                    <textarea name="description" rows="4" placeholder="Masukkan sinopsis atau deskripsi singkat buku..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-gray-800"></textarea>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi / Sinopsis <span class="text-red-500">*</span></label>
+                    <textarea name="description" rows="3" required placeholder="Masukkan sinopsis atau deskripsi lengkap buku..."
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:outline-none transition bg-gray-50 text-gray-800"></textarea>
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1.5 text-gray-700">Nama Penulis</label>
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Nama Penulis <span class="text-red-500">*</span></label>
                     <input type="text" name="author" required placeholder="Masukkan nama penulis..."
-                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                         class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                 </div>
 
-                <div class="mb-5 flex gap-4">
-                    <div class="w-1/2">
-                        <label class="block text-sm font-semibold mb-1.5 text-gray-700">Harga (Rp)</label>
-                        <input type="number" name="price" required placeholder="Contoh: 75000"
-                            class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Kategori</label>
+                        <input type="text" name="category" placeholder="Fiksi, Sains, Agama..."
+                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                     </div>
-                    <div class="w-1/2">
-                        <label class="block text-sm font-semibold mb-1.5 text-gray-700">Stok</label>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Stok <span class="text-red-500">*</span></label>
                         <input type="number" name="stock" required placeholder="Contoh: 20"
-                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition bg-gray-50">
+                             class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2">
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">Harga (Rp) <span class="text-red-500">*</span></label>
+                    <input type="number" name="price" required placeholder="Contoh: 75000"
+                        class="w-full border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700 font-bold">Genre Buku</label>
+                    <div class="grid grid-cols-3 gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200 max-h-32 overflow-y-auto">
+                        @php 
+                            $daftarGenre = ['Fiksi', 'Non-Fiksi', 'Edukasi', 'Novel', 'Sejarah', 'Fantasi', 'Misteri', 'Biografi', 'Romantis', 'Teknologi', 'Sains', 'Agama'];
+                        @endphp
+                        @foreach($daftarGenre as $genre)
+                        <label class="flex items-center space-x-1.5 cursor-pointer">
+                            <input type="checkbox" name="genres[]" value="{{ $genre }}" 
+                                class="w-3.5 h-3.5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                            <span class="text-xs text-gray-700 font-medium">{{ $genre }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
                     <button type="button" onclick="tutupModal()"
                         class="px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-200 transition">
                         Batal
@@ -547,6 +618,198 @@
                 }
             });
         }
+    </script>
+
+    {{-- ===== MODAL REVIEW BUKU (Global Alpine.js Component) ===== --}}
+    <div x-data="reviewModal()" @open-review.window="open($event.detail.id)" x-show="isOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center">
+        <!-- Backdrop -->
+        <div x-show="isOpen" x-transition.opacity class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="close()"></div>
+        
+        <!-- Modal Content -->
+        <div x-show="isOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+             class="relative bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 line-clamp-1" x-text="'Ulasan: ' + bookTitle">Ulasan Buku</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-yellow-400 text-sm">⭐</span>
+                        <span class="text-sm font-bold text-gray-700" x-text="averageRating + ' rata-rata'"></span>
+                        <span class="text-sm text-gray-400" x-text="'(' + totalReviews + ' ulasan)'"></span>
+                    </div>
+                </div>
+                <button @click="close()" class="p-2 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-4 z-10">
+                <!-- Rating Filter -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Bintang:</span>
+                    <select x-model="filterRating" class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua</option>
+                        <option value="5">5 Bintang</option>
+                        <option value="4">4 Bintang</option>
+                        <option value="3">3 Bintang</option>
+                        <option value="2">2 Bintang</option>
+                        <option value="1">1 Bintang</option>
+                    </select>
+                </div>
+                
+                <!-- Sentiment Filter -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori:</span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="showPositif = !showPositif" :class="showPositif ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Positif
+                        </button>
+                        <button type="button" @click="showKritis = !showKritis" :class="showKritis ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Negatif
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                @if(Auth::check() && Auth::user()->role === 'user')
+                <!-- Tulis Ulasan Form -->
+                <div class="mb-5">
+                    <button @click="showWriteForm = !showWriteForm" class="w-full flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl border border-indigo-100 transition text-sm">
+                        <span x-text="showWriteForm ? '✕ Batal Menulis Ulasan' : '✍️ Tulis Ulasan Baru'"></span>
+                    </button>
+                    
+                    <div x-show="showWriteForm" x-transition class="mt-3 bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm">
+                        <form :action="'/books/' + bookId + '/reviews'" method="POST" class="flex flex-col gap-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Rating Bintang</label>
+                                <select name="rating" required class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5) Sangat Bagus</option>
+                                    <option value="4">⭐⭐⭐⭐ (4) Bagus</option>
+                                    <option value="3">⭐⭐⭐ (3) Lumayan</option>
+                                    <option value="2">⭐⭐ (2) Buruk</option>
+                                    <option value="1">⭐ (1) Sangat Buruk</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Komentar</label>
+                                <textarea name="comment" rows="3" required placeholder="Bagaimana menurutmu tentang buku ini?" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+                                    Kirim Ulasan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Loading State -->
+                <div x-show="isLoading" class="flex flex-col items-center justify-center py-12">
+                    <svg class="w-10 h-10 text-indigo-500 animate-spin mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-sm font-medium text-gray-500">Memuat ulasan NLP...</span>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="!isLoading && filteredReviews.length === 0" class="flex flex-col items-center justify-center py-12 text-center" style="display: none;">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-4">😶</div>
+                    <h3 class="text-gray-900 font-bold mb-1">Tidak ada ulasan ditemukan</h3>
+                    <p class="text-sm text-gray-500">Cobalah mengubah filter pencarian Anda.</p>
+                </div>
+
+                <!-- Reviews List -->
+                <div x-show="!isLoading && filteredReviews.length > 0" class="space-y-4" style="display: none;">
+                    <template x-for="review in filteredReviews" :key="review.id">
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm" x-text="review.user_name"></h4>
+                                    <span class="text-xs text-gray-400" x-text="review.created_at_human"></span>
+                                </div>
+                                <div class="flex flex-col items-end gap-1.5">
+                                    <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full border border-yellow-200">
+                                        ⭐ <span x-text="review.rating + '/5'"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed" x-text="review.comment"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('reviewModal', () => ({
+                isOpen: false,
+                isLoading: false,
+                bookId: null,
+                showWriteForm: false,
+                bookTitle: '',
+                averageRating: 0,
+                totalReviews: 0,
+                reviews: [],
+                filterRating: 'all',
+                showPositif: false,
+                showKritis: false,
+                
+                open(id) {
+                    this.isOpen = true;
+                    this.isLoading = true;
+                    this.bookId = id;
+                    this.showWriteForm = false;
+                    this.reviews = [];
+                    // Reset filters when opening new book
+                    this.filterRating = 'all';
+                    this.showPositif = false;
+                    this.showKritis = false;
+                    
+                    fetch('/api/books/' + id + '/reviews')
+                        .then(res => res.json())
+                        .then(data => {
+                            this.bookTitle = data.book_title;
+                            this.averageRating = data.average_rating;
+                            this.totalReviews = data.total_reviews;
+                            this.reviews = data.reviews;
+                            this.isLoading = false;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            this.isLoading = false;
+                        });
+                },
+                close() {
+                    this.isOpen = false;
+                },
+                get filteredReviews() {
+                    return this.reviews.filter(review => {
+                        const matchRating = this.filterRating === 'all' || review.rating.toString() === this.filterRating;
+                        const showAllSentiment = !this.showPositif && !this.showKritis;
+                        let matchSentiment = false;
+                        if (showAllSentiment) {
+                            matchSentiment = true;
+                        } else {
+                            if (this.showPositif && review.sentiment === 'positif') matchSentiment = true;
+                            if (this.showKritis && review.sentiment === 'kritis') matchSentiment = true;
+                        }
+                        return matchRating && matchSentiment;
+                    });
+                }
+            }));
+        });
     </script>
 </body>
 </html>

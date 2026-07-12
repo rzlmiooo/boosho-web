@@ -3,7 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $book->title }} - Detail Buku</title>
+    <title>{{ $book->title }} - Detail Buku | BooSho</title>
+    <meta name="description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}. Stok tersedia: {{ $book->stock }}. Dapatkan buku digital berkualitas sekarang!">
+    <meta name="keywords" content="{{ $book->title }}, {{ $book->author }}, buku digital, ebook, beli buku {{ $book->title }}, boosho">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="{{ $book->title }} - Detail Buku | BooSho">
+    <meta property="og:description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}. Stok tersedia: {{ $book->stock }}.">
+    <meta property="og:image" content="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="book">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $book->title }} - Detail Buku | BooSho">
+    <meta name="twitter:description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}.">
+    <meta name="twitter:image" content="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f' }}">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -18,24 +36,30 @@
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     <!-- Navigasi -->
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></span>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
                 @if(Auth::check() && Auth::user()->isAdmin())
-                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📦 Daftar Pembelian</a>
+                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @elseif(Auth::check())
-                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @endif
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+        @if(Auth::check())
+            @include('partials.notification-bell')
+        @endif
         <!-- Profile Dropdown -->
         <div class="relative" x-data="{ open: false }">
             @if(Auth::check())
@@ -92,10 +116,16 @@
         </a>
 
         @if(session('success'))
-            <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm">✅ {{ session('success') }}</div>
+            <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ session('success') }}
+            </div>
         @endif
         @if(session('error'))
-            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm">⚠️ {{ session('error') }}</div>
+            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                {{ session('error') }}
+            </div>
         @endif
 
         <!-- Card Container Utama -->
@@ -138,17 +168,27 @@
 
                             <div class="flex flex-col">
                                 <span class="text-xs text-gray-400 font-bold mb-1.5 uppercase tracking-wider">Harga</span>
-                                <span class="text-xl font-bold text-blue-600">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                @if($book->discounted_price < $book->price)
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                        <span class="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">{{ $book->discount_percent }}% OFF</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-red-600">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</span>
+                                @else
+                                    <span class="text-xl font-bold text-blue-600">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                @endif
                             </div>
 
                             <div class="flex flex-col">
-                                <span class="text-xs text-gray-400 font-bold mb-1.5 uppercase tracking-wider">Status Stok</span>
+                                <span class="text-xs text-gray-400 font-bold mb-1.5 uppercase tracking-wider">Ulasan</span>
                                 <div>
-                                    @if($book->stock <= 0)
-                                        <span class="inline-block text-[11px] font-bold bg-red-50 text-red-500 border border-red-100 px-3 py-1 rounded-full">Habis</span>
-                                    @else
-                                        <span class="inline-block text-[11px] font-bold bg-green-50 text-green-600 border border-green-100 px-3 py-1 rounded-full">Tersedia ({{ $book->stock }})</span>
-                                    @endif
+                                    <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-2 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-3 py-1.5 rounded-full transition group shadow-sm">
+                                        <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
+                                        <span class="text-sm font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Belum direview' }}</span>
+                                        @if($book->reviews->count() > 0)
+                                            <span class="text-[10px] text-yellow-600 font-medium ml-1">({{ $book->reviews->count() }})</span>
+                                        @endif
+                                    </button>
                                 </div>
                             </div>
 
@@ -194,12 +234,15 @@
                                         </div>
 
                                         <!-- Tombol Tambah Keranjang -->
-                                        <div class="w-full sm:w-auto sm:flex-1 sm:mt-6">
+                                        <div class="w-full sm:w-auto sm:flex-1 sm:mt-6 relative">
                                             <button type="submit"
                                                 class="w-full px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition shadow-md hover:shadow-lg hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                                 Tambah ke Keranjang
                                             </button>
+                                            <div class="absolute -top-3 -right-2 bg-green-100 border border-green-200 text-green-700 text-[10px] font-extrabold px-2 py-1 rounded-full shadow-sm">
+                                                Stok: {{ $book->stock }}
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -221,6 +264,9 @@
 
                 </div>
             </div>
+            
+            
+            
         </div>
     </div>
 
@@ -262,6 +308,198 @@
                 confirmButtonText: 'Ya, Keluar!', cancelButtonText: 'Batal'
             }).then((r) => { if (r.isConfirmed) document.getElementById('logout-form').submit(); })
         }
+    </script>
+
+    {{-- ===== MODAL REVIEW BUKU (Global Alpine.js Component) ===== --}}
+    <div x-data="reviewModal()" @open-review.window="open($event.detail.id)" x-show="isOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center">
+        <!-- Backdrop -->
+        <div x-show="isOpen" x-transition.opacity class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="close()"></div>
+        
+        <!-- Modal Content -->
+        <div x-show="isOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+             class="relative bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 line-clamp-1" x-text="'Ulasan: ' + bookTitle">Ulasan Buku</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-yellow-400 text-sm">⭐</span>
+                        <span class="text-sm font-bold text-gray-700" x-text="averageRating + ' rata-rata'"></span>
+                        <span class="text-sm text-gray-400" x-text="'(' + totalReviews + ' ulasan)'"></span>
+                    </div>
+                </div>
+                <button @click="close()" class="p-2 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-4 z-10">
+                <!-- Rating Filter -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Bintang:</span>
+                    <select x-model="filterRating" class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua</option>
+                        <option value="5">5 Bintang</option>
+                        <option value="4">4 Bintang</option>
+                        <option value="3">3 Bintang</option>
+                        <option value="2">2 Bintang</option>
+                        <option value="1">1 Bintang</option>
+                    </select>
+                </div>
+                
+                <!-- Sentiment Filter -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori:</span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="showPositif = !showPositif" :class="showPositif ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Positif
+                        </button>
+                        <button type="button" @click="showKritis = !showKritis" :class="showKritis ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Negatif
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                @if(Auth::check() && Auth::user()->role === 'user')
+                <!-- Tulis Ulasan Form -->
+                <div class="mb-5">
+                    <button @click="showWriteForm = !showWriteForm" class="w-full flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl border border-indigo-100 transition text-sm">
+                        <span x-text="showWriteForm ? '✕ Batal Menulis Ulasan' : '✍️ Tulis Ulasan Baru'"></span>
+                    </button>
+                    
+                    <div x-show="showWriteForm" x-transition class="mt-3 bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm">
+                        <form :action="'/books/' + bookId + '/reviews'" method="POST" class="flex flex-col gap-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Rating Bintang</label>
+                                <select name="rating" required class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5) Sangat Bagus</option>
+                                    <option value="4">⭐⭐⭐⭐ (4) Bagus</option>
+                                    <option value="3">⭐⭐⭐ (3) Lumayan</option>
+                                    <option value="2">⭐⭐ (2) Buruk</option>
+                                    <option value="1">⭐ (1) Sangat Buruk</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Komentar</label>
+                                <textarea name="comment" rows="3" required placeholder="Bagaimana menurutmu tentang buku ini?" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+                                    Kirim Ulasan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Loading State -->
+                <div x-show="isLoading" class="flex flex-col items-center justify-center py-12">
+                    <svg class="w-10 h-10 text-indigo-500 animate-spin mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-sm font-medium text-gray-500">Memuat ulasan NLP...</span>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="!isLoading && filteredReviews.length === 0" class="flex flex-col items-center justify-center py-12 text-center" style="display: none;">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-4">😶</div>
+                    <h3 class="text-gray-900 font-bold mb-1">Tidak ada ulasan ditemukan</h3>
+                    <p class="text-sm text-gray-500">Cobalah mengubah filter pencarian Anda.</p>
+                </div>
+
+                <!-- Reviews List -->
+                <div x-show="!isLoading && filteredReviews.length > 0" class="space-y-4" style="display: none;">
+                    <template x-for="review in filteredReviews" :key="review.id">
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm" x-text="review.user_name"></h4>
+                                    <span class="text-xs text-gray-400" x-text="review.created_at_human"></span>
+                                </div>
+                                <div class="flex flex-col items-end gap-1.5">
+                                    <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full border border-yellow-200">
+                                        ⭐ <span x-text="review.rating + '/5'"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed" x-text="review.comment"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('reviewModal', () => ({
+                isOpen: false,
+                isLoading: false,
+                bookId: null,
+                showWriteForm: false,
+                bookTitle: '',
+                averageRating: 0,
+                totalReviews: 0,
+                reviews: [],
+                filterRating: 'all',
+                showPositif: false,
+                showKritis: false,
+                
+                open(id) {
+                    this.isOpen = true;
+                    this.isLoading = true;
+                    this.bookId = id;
+                    this.showWriteForm = false;
+                    this.reviews = [];
+                    // Reset filters when opening new book
+                    this.filterRating = 'all';
+                    this.showPositif = false;
+                    this.showKritis = false;
+                    
+                    fetch('/api/books/' + id + '/reviews')
+                        .then(res => res.json())
+                        .then(data => {
+                            this.bookTitle = data.book_title;
+                            this.averageRating = data.average_rating;
+                            this.totalReviews = data.total_reviews;
+                            this.reviews = data.reviews;
+                            this.isLoading = false;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            this.isLoading = false;
+                        });
+                },
+                close() {
+                    this.isOpen = false;
+                },
+                get filteredReviews() {
+                    return this.reviews.filter(review => {
+                        const matchRating = this.filterRating === 'all' || review.rating.toString() === this.filterRating;
+                        const showAllSentiment = !this.showPositif && !this.showKritis;
+                        let matchSentiment = false;
+                        if (showAllSentiment) {
+                            matchSentiment = true;
+                        } else {
+                            if (this.showPositif && review.sentiment === 'positif') matchSentiment = true;
+                            if (this.showKritis && review.sentiment === 'kritis') matchSentiment = true;
+                        }
+                        return matchRating && matchSentiment;
+                    });
+                }
+            }));
+        });
     </script>
 </body>
 </html>

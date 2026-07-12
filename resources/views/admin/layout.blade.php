@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard') - BooSho</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,14 +16,21 @@
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="text-gray-800 flex h-screen overflow-hidden">
+<body class="text-gray-800 flex h-screen overflow-hidden" x-data="{ sidebarOpen: true }">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-indigo-100 flex flex-col justify-between flex-shrink-0 h-full">
+    <aside 
+        class="bg-white border-r border-indigo-100 flex flex-col justify-between flex-shrink-0 h-full transition-all duration-300 ease-in-out z-20"
+        :class="sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full lg:w-0 overflow-hidden border-r-0'"
+    >
         <div>
             <!-- Logo -->
-            <div class="h-16 flex items-center px-6 border-b border-indigo-100">
+            <div class="h-16 flex items-center justify-between px-6 border-b border-indigo-100">
                 <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+                <!-- Mobile close button -->
+                <button @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
             <!-- Navigation Links -->
@@ -38,8 +46,8 @@
                 </a>
 
                 <a href="{{ route('admin.orders') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.orders') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-indigo-600 font-medium' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    Daftar Pembelian
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    Daftar Pesanan
                 </a>
             </nav>
         </div>
@@ -61,9 +69,16 @@
         
         <!-- Navbar Minimalis -->
         <header class="h-16 bg-white/90 backdrop-blur shadow-sm px-8 flex justify-between items-center border-b border-indigo-100 flex-shrink-0 z-10">
-            <h2 class="text-lg font-bold text-gray-800">@yield('title')</h2>
+            <div class="flex items-center gap-4">
+                <!-- Hamburger menu button -->
+                <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 transition focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <h2 class="text-lg font-bold text-gray-800">@yield('title')</h2>
+            </div>
             
             <div class="flex items-center gap-3">
+                @include('partials.notification-bell')
                 <div class="text-right hidden sm:block">
                     <p class="text-sm font-bold text-gray-800 leading-tight">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-indigo-600 font-medium">Administrator</p>

@@ -4,30 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keranjang Belanja - BooSho</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style> body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; } </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></span>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
                 @if(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📦 Daftar Pembelian</a>
+                    <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">📋 Daftar Pesanan</a>
                 @else
-                    <a href="{{ route('keranjang') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">🛒 Keranjang</a>
+                    <a href="{{ route('keranjang') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Keranjang
+                    </a>
                 @endif
             </div>
         </div>
         
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+            @if(Auth::check())
+                @include('partials.notification-bell')
+            @endif
             <div class="relative" x-data="{ open: false }">
                 @if(Auth::check())
                     <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">
@@ -81,17 +90,22 @@
             </a>
             <div class="h-5 w-px bg-gray-200"></div>
             <div>
-                <h1 class="text-xl font-bold text-gray-800">🛒 Keranjang Belanja</h1>
+                <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Keranjang Belanja
+                </h1>
             </div>
         </div>
 
         @if($carts->isEmpty())
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
-                <div class="text-5xl mb-4">🛒</div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center flex flex-col items-center justify-center">
+                <div class="text-gray-300 mb-4">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
                 <h3 class="text-lg font-bold text-gray-700 mb-2">Keranjang Masih Kosong</h3>
                 <p class="text-sm text-gray-400 mb-6">Tambahkan buku dari katalog untuk memulai belanja.</p>
                 <a href="{{ route('katalog') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-sm">
-                    📖 Jelajahi Katalog Buku
+                    Jelajahi Katalog Buku
                 </a>
             </div>
 
@@ -110,7 +124,7 @@
                         <div class="p-4 flex flex-col gap-3">
                             @foreach($carts as $cart)
                             @php 
-                                $subtotal = $cart->book->price * $cart->quantity;
+                                $subtotal = $cart->book->discounted_price * $cart->quantity;
                                 $totalHarga += $subtotal; 
                             @endphp
                             <div class="flex flex-col sm:flex-row sm:items-center gap-4 border border-gray-100 rounded-xl p-4 hover:border-indigo-100 hover:bg-indigo-50/20 transition">
@@ -128,7 +142,12 @@
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-indigo-600 text-sm truncate">{{ $cart->book->title }}</h3>
                                         <p class="text-xs text-gray-400">{{ $cart->book->author }}</p>
-                                        <p class="text-xs text-gray-500 font-semibold mt-0.5">Rp {{ number_format($cart->book->price, 0, ',', '.') }} / buku</p>
+                                        @if($cart->book->discounted_price < $cart->book->price)
+                                            <span class="text-[10px] text-gray-400 line-through">Rp {{ number_format($cart->book->price, 0, ',', '.') }}</span>
+                                            <p class="text-xs text-red-500 font-bold">Rp {{ number_format($cart->book->discounted_price, 0, ',', '.') }} / buku</p>
+                                        @else
+                                            <p class="text-xs text-gray-500 font-semibold mt-0.5">Rp {{ number_format($cart->book->price, 0, ',', '.') }} / buku</p>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -169,6 +188,33 @@
                             @endforeach
                         </div>
                     </div>
+
+                    <!-- Informasi Pengiriman -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+                        <h3 class="font-bold text-gray-800 text-base mb-4 flex items-center gap-2">
+                            📍 Informasi Pengiriman & Lokasi
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Alamat Pengiriman Lengkap</label>
+                                <textarea id="address-input" rows="3" placeholder="Contoh: Jl. Sudirman No. 123, Blok C, Jakarta Selatan" class="w-full border border-gray-300 px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pinpoint Koordinat (Klik pada peta)</label>
+                                <div id="map" class="h-64 rounded-xl border border-gray-200" style="z-index: 10;"></div>
+                                <div class="grid grid-cols-2 gap-3 mt-3">
+                                    <div>
+                                        <label class="block text-[10px] text-gray-400 font-bold uppercase mb-1">Latitude</label>
+                                        <input type="text" id="latitude-input" readonly class="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg text-xs font-mono text-gray-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-gray-400 font-bold uppercase mb-1">Longitude</label>
+                                        <input type="text" id="longitude-input" readonly class="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg text-xs font-mono text-gray-500">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="lg:w-72 flex-shrink-0">
@@ -177,7 +223,7 @@
 
                         <div class="space-y-2 mb-4">
                             @foreach($carts as $cart)
-                            @php $s = $cart->book->price * $cart->quantity; @endphp
+                            @php $s = $cart->book->discounted_price * $cart->quantity; @endphp
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-gray-500 truncate max-w-[140px]">{{ $cart->book->title }} (×{{ $cart->quantity }})</span>
                                 <span class="text-gray-700 font-semibold flex-shrink-0 ml-2">Rp {{ number_format($s, 0, ',', '.') }}</span>
@@ -199,6 +245,10 @@
                             @foreach($carts as $cart)
                                 <input type="hidden" name="quantities[{{ $cart->id }}]" value="{{ $cart->quantity }}">
                             @endforeach
+
+                            <input type="hidden" name="address" id="form-address">
+                            <input type="hidden" name="latitude" id="form-latitude">
+                            <input type="hidden" name="longitude" id="form-longitude">
 
                             <button type="button" onclick="konfirmasiCheckout()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-sm active:scale-95 flex items-center justify-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,14 +274,108 @@
         @if(session('success')) Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session("success") }}', showConfirmButton: false, timer: 1800 }); @endif
         @if(session('error')) Swal.fire({ icon: 'error', title: 'Oops!', text: '{{ session("error") }}', confirmButtonColor: '#4f46e5' }); @endif
 
+        // Leaflet Map Initialization
+        let defaultLat = -6.200000;
+        let defaultLng = 106.816666;
+        
+        let map = L.map('map').setView([defaultLat, defaultLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+        function updateCoords(lat, lng) {
+            document.getElementById('latitude-input').value = lat.toFixed(8);
+            document.getElementById('longitude-input').value = lng.toFixed(8);
+        }
+
+        // Set initial coordinates
+        updateCoords(defaultLat, defaultLng);
+
+        function fetchReverseGeocode(lat, lng) {
+            const addressInput = document.getElementById('address-input');
+            addressInput.value = 'Mengambil alamat otomatis...';
+            
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+                headers: {
+                    'Accept-Language': 'id'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    addressInput.value = data.display_name;
+                } else {
+                    addressInput.value = '';
+                    addressInput.placeholder = 'Gagal mengambil alamat otomatis, silakan isi manual.';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                addressInput.value = '';
+                addressInput.placeholder = 'Gagal mengambil alamat otomatis, silakan isi manual.';
+            });
+        }
+
+        // Geolocation: Auto detect user position
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let userLat = position.coords.latitude;
+                let userLng = position.coords.longitude;
+                map.setView([userLat, userLng], 15);
+                marker.setLatLng([userLat, userLng]);
+                updateCoords(userLat, userLng);
+                fetchReverseGeocode(userLat, userLng);
+            }, function(err) {
+                console.warn('Geolocation blocked or unavailable: ', err);
+                fetchReverseGeocode(defaultLat, defaultLng);
+            });
+        } else {
+            fetchReverseGeocode(defaultLat, defaultLng);
+        }
+
+        marker.on('dragend', function(e) {
+            let latLng = marker.getLatLng();
+            updateCoords(latLng.lat, latLng.lng);
+            fetchReverseGeocode(latLng.lat, latLng.lng);
+        });
+
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateCoords(e.latlng.lat, e.latlng.lng);
+            fetchReverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+
         function konfirmasiCheckout() {
+            const address = document.getElementById('address-input').value.trim();
+            const lat = document.getElementById('latitude-input').value;
+            const lng = document.getElementById('longitude-input').value;
+
+            if (!address) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Alamat Belum Lengkap',
+                    text: 'Silakan isi Alamat Pengiriman Lengkap terlebih dahulu.',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
+
             Swal.fire({
-                title: '🛒 Konfirmasi Checkout',
+                title: 'Konfirmasi Checkout',
                 text: "Setelah checkout, pesanan akan diproses dan Anda bisa melihatnya di menu 'Pesanan Saya'.",
                 icon: 'info', showCancelButton: true,
                 confirmButtonColor: '#16a34a', cancelButtonColor: '#d33',
                 confirmButtonText: 'Ya, Checkout!', cancelButtonText: 'Batal'
-            }).then((r) => { if (r.isConfirmed) document.getElementById('checkout-form').submit(); })
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    document.getElementById('form-address').value = address;
+                    document.getElementById('form-latitude').value = lat;
+                    document.getElementById('form-longitude').value = lng;
+                    document.getElementById('checkout-form').submit();
+                }
+            })
         }
 
         function konfirmasiLogout() {

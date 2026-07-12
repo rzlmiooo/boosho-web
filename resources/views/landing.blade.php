@@ -4,7 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>BooSho - Toko Buku Digital</title>
+    <title>BooSho - Toko Buku Digital Terpercaya</title>
+    <meta name="description" content="Temukan dan beli buku digital favorit Anda di BooSho. Platform toko buku digital cepat, nyaman, dan terpercaya dengan ribuan koleksi terlengkap.">
+    <meta name="keywords" content="toko buku, buku digital, ebook, beli ebook, katalog buku, boosho">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="BooSho - Toko Buku Digital Terpercaya">
+    <meta property="og:description" content="Temukan dan beli buku digital favorit Anda di BooSho. Platform toko buku digital cepat, nyaman, dan terpercaya dengan ribuan koleksi terlengkap.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BooSho - Toko Buku Digital Terpercaya">
+    <meta name="twitter:description" content="Temukan dan beli buku digital favorit Anda di BooSho. Platform toko buku digital cepat, nyaman, dan terpercaya dengan ribuan koleksi terlengkap.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -19,9 +36,9 @@
     <!-- Navbar -->
     <nav class="bg-white shadow">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-blue-600">
+            <span class="text-2xl font-bold text-blue-600">
                 BooSho.
-            </h1>
+            </span>
 
             <div class="space-x-4">
                 <a href="{{ route('login') }}"

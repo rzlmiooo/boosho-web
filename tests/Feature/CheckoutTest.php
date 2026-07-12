@@ -39,6 +39,7 @@ class CheckoutTest extends TestCase
         $book = Book::create([
             'title' => 'Laravel Advanced',
             'author' => 'Taylor Otwell',
+            'description' => 'Advanced Laravel Book',
             'price' => 100000,
             'stock' => 10
         ]);
@@ -55,8 +56,13 @@ class CheckoutTest extends TestCase
         ]);
 
         // 3. User melakukan Checkout
-        $responseCheckout = $this->post('/checkout');
-        $responseCheckout->assertRedirect(route('dashboard'));
+        $cart = Cart::where('user_id', $user->id)->first();
+        $responseCheckout = $this->post('/checkout', [
+            'quantities' => [
+                $cart->id => 2
+            ]
+        ]);
+        $responseCheckout->assertRedirect(route('account'));
 
         // Cek keranjang harus sudah dikosongkan
         $this->assertDatabaseMissing('carts', [
@@ -68,7 +74,6 @@ class CheckoutTest extends TestCase
             'user_id' => $user->id,
             'total_price' => 200000,
             'status' => 'pending',
-            'payment_code' => null
         ]);
 
         $order = Order::where('user_id', $user->id)->first();
@@ -123,6 +128,7 @@ class CheckoutTest extends TestCase
         $book = Book::create([
             'title' => 'Limited Edition',
             'author' => 'Author A',
+            'description' => 'Limited Edition Book',
             'price' => 50000,
             'stock' => 1
         ]);
@@ -137,7 +143,11 @@ class CheckoutTest extends TestCase
         $cart->update(['quantity' => 2]); // Kebutuhan 2, stok cuma 1
 
         // Checkout
-        $response = $this->post('/checkout');
+        $response = $this->post('/checkout', [
+            'quantities' => [
+                $cart->id => 2
+            ]
+        ]);
         $response->assertSessionHas('error');
 
         // Order untuk user ini tidak boleh terbentuk

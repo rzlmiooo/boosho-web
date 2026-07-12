@@ -28,7 +28,8 @@ class AdminBookController extends Controller
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'genres' => 'nullable|array'
         ]);
 
         $data = $validated;
@@ -66,7 +67,8 @@ class AdminBookController extends Controller
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'genres' => 'nullable|array'
         ]);
 
         $data = $validated;
@@ -87,13 +89,41 @@ class AdminBookController extends Controller
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
-
-        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
-            Storage::disk('public')->delete($book->cover);
-        }
-
         $book->delete();
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil dihapus!');
+    }
+
+    /**
+     * Set batch discount for multiple books.
+     */
+    public function batchDiscount(Request $request)
+    {
+        $request->validate([
+            'book_ids' => 'required|array',
+            'book_ids.*' => 'exists:books,id',
+            'discount_percent' => 'required|integer|min:0|max:100',
+            'discount_start' => 'nullable|date',
+            'discount_end' => 'nullable|date|after_or_equal:discount_start',
+        ]);
+
+        Book::whereIn('id', $request->book_ids)->update([
+            'discount_percent' => $request->discount_percent,
+            'discount_start' => $request->discount_start,
+            'discount_end' => $request->discount_end,
+        ]);
+
+        // Kirim notifikasi promo diskon ke semua user
+        if ($request->discount_percent > 0) {
+            $bookCount = count($request->book_ids);
+            \App\Models\Notification::sendToAllUsers(
+                '🔥 Promo Diskon ' . $request->discount_percent . '% Spesial!',
+                'Ada ' . $bookCount . ' buku yang sedang diskon hingga ' . $request->discount_percent . '%. Jangan sampai kehabisan!',
+                '/katalog',
+                'promo'
+            );
+        }
+
+        return redirect()->route('admin.books.index')->with('success', 'Diskon massal berhasil diterapkan pada ' . count($request->book_ids) . ' buku!');
     }
 }
