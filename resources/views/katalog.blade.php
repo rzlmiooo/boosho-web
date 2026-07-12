@@ -304,97 +304,105 @@
                         @else
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="book-grid">
                             @foreach($books as $book)
-                            <div class="bg-white border border-gray-100 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition duration-300 group">
+                            <div class="border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden">
                                 
-                                {{-- Bagian Atas: Icon Mini, Judul, Penulis, Deskripsi --}}
-                                <div>
-                                    {{-- Icon Buku / Cover Mini di pojok kiri atas --}}
-                                    <div class="w-12 h-12 bg-indigo-50 rounded-[14px] flex items-center justify-center text-indigo-500 mb-5">
-                                        @if(isset($book->cover) && $book->cover)
-                                            <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover" class="w-full h-full object-cover rounded-[14px]">
-                                        @else
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                {{-- Cover Image Container --}}
+                                <div class="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                                    @if(isset($book->cover) && $book->cover)
+                                        <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover {{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    @else
+                                        <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
+                                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                                             </svg>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
 
-                                    <h3 class="font-bold text-xl text-gray-900 leading-snug mb-1 line-clamp-2">
-                                        @if(request('search'))
-                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
-                                        @else
-                                            {{ $book->title }}
-                                        @endif
-                                    </h3>
-                                    
-                                    {{-- Nama penulis berwarna ungu/indigo sesuai screenshot --}}
-                                    <p class="text-[15px] font-semibold text-indigo-500 mb-3">
-                                        @if(request('search'))
-                                            {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
-                                        @else
-                                            {{ $book->author }}
-                                        @endif
-                                    </p>
-
-                                    @if($book->description)
-                                        <p class="text-sm text-gray-500 line-clamp-2">
-                                            {{ $book->description }}
-                                        </p>
+                                    @if($book->category)
+                                        <span class="absolute top-3 left-3 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                                            {{ $book->category }}
+                                        </span>
                                     @endif
                                 </div>
 
-                                {{-- Bagian Bawah: Harga, Stok, & Tombol --}}
-                                <div class="mt-6">
-                                    {{-- Divider border-t dan layout Harga & Review --}}
-                                    <div class="border-t border-gray-100 pt-5 mb-5 flex items-center justify-between">
-                                        <div class="flex flex-col">
-                                            @if($book->discounted_price < $book->price)
-                                                <div class="flex items-center gap-2 mb-0.5">
-                                                    <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
-                                                    <span class="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">{{ $book->discount_percent }}% OFF</span>
-                                                </div>
-                                                <span class="font-extrabold text-xl text-red-600 tracking-tight">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</span>
+                                {{-- Card Content --}}
+                                <div class="p-5 flex flex-col flex-grow justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-sm leading-snug mb-1 line-clamp-2">
+                                            @if(request('search'))
+                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->title)) !!}
                                             @else
-                                                <span class="font-extrabold text-xl text-gray-900 tracking-tight">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                                {{ $book->title }}
                                             @endif
-                                        </div>
+                                        </h3>
                                         
-                                        <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-3 py-1.5 rounded-full transition group shadow-sm">
-                                            <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
-                                            <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
-                                        </button>
+                                        <p class="text-xs text-gray-400 mb-3">
+                                            @if(request('search'))
+                                                {!! preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<mark class="bg-yellow-100 text-yellow-800 rounded px-0.5">$1</mark>', e($book->author)) !!}
+                                            @else
+                                                {{ $book->author }}
+                                            @endif
+                                        </p>
+
+                                        @if($book->genres)
+                                            <div class="flex flex-wrap gap-1 mb-4">
+                                                @foreach(array_slice($book->genres, 0, 2) as $genre)
+                                                    <span class="text-[9px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full border border-slate-200">
+                                                        {{ $genre }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
 
-                                    {{-- Susunan Tombol --}}
-                                    @if(Auth::check() && Auth::user()->isAdmin())
-                                        <div class="flex gap-2 relative">
-                                            <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-[15px] py-3 rounded-xl transition shadow-sm">Edit</a>
-                                            <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-[15px] text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-3 rounded-xl transition shadow-sm">Hapus</button>
-                                        </div>
-                                    @else
-                                        <div class="flex flex-col gap-2.5">
-                                            <a href="/books/{{ $book->id }}" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[15px] py-3 rounded-xl transition text-center block shadow-sm border border-indigo-100">
-                                                Detail Buku
-                                            </a>
-                                            
-                                            <div class="relative">
-                                                @if($book->stock > 0)
-                                                    <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[15px] py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                                        + Keranjang
-                                                    </button>
-                                                    <div class="absolute -top-2.5 -right-2 bg-green-100 border border-green-200 text-green-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">
-                                                        Stok: {{ $book->stock }}
-                                                    </div>
+                                    <div>
+                                        {{-- Price & Rating --}}
+                                        <div class="flex justify-between items-center mb-4">
+                                            <div>
+                                                @if($book->discounted_price < $book->price)
+                                                    <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                                    <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</p>
                                                 @else
-                                                    <button type="button" disabled class="w-full bg-gray-100 text-gray-400 font-bold text-[15px] py-3 rounded-xl cursor-not-allowed border border-gray-200 flex items-center justify-center gap-2">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                                        Stok Habis
-                                                    </button>
+                                                    <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->price, 0, ',', '.') }}</p>
                                                 @endif
                                             </div>
+                                            
+                                            <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
+                                                <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
+                                                <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
+                                            </button>
                                         </div>
-                                    @endif
+
+                                        {{-- Action Buttons --}}
+                                        <div class="pt-3 border-t border-gray-100 relative">
+                                            @if(Auth::check() && Auth::user()->isAdmin())
+                                                <div class="flex gap-2">
+                                                    <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-xs py-2 rounded-xl transition shadow-sm">Edit</a>
+                                                    <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-xs text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-2 rounded-xl transition shadow-sm">Hapus</button>
+                                                </div>
+                                            @else
+                                                <div class="flex flex-col gap-2">
+                                                    <a href="/books/{{ $book->id }}" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
+                                                        Detail Buku
+                                                    </a>
+                                                    @if($book->stock > 0)
+                                                        <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                            + Keranjang
+                                                        </button>
+                                                        <div class="absolute -top-2 -right-1 bg-green-100 border border-green-200 text-green-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full shadow-sm">
+                                                            Stok: {{ $book->stock }}
+                                                        </div>
+                                                    @else
+                                                        <button type="button" disabled class="w-full bg-gray-100 text-gray-400 font-bold text-xs py-2 rounded-xl cursor-not-allowed border border-gray-200 flex items-center justify-center gap-1.5">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                            Stok Habis
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             @endforeach
