@@ -4,14 +4,33 @@
         notifOpen: false, 
         unreadCount: {{ isset($unreadNotifCount) ? $unreadNotifCount : 0 }}, 
         notifications: [],
+        toastOpen: false,
+        toastNotif: null,
+        toastTimer: null,
+        
         fetchNotifs() {
             fetch('{{ route('api.notifications') }}')
                 .then(res => res.json())
                 .then(data => {
+                    // Cek jika ada notifikasi baru (unread count bertambah)
+                    if (this.notifications.length > 0 && data.unread_count > this.unreadCount) {
+                        const newNotif = data.notifications[0];
+                        if (newNotif) {
+                            this.triggerToast(newNotif);
+                        }
+                    }
                     this.unreadCount = data.unread_count;
                     this.notifications = data.notifications;
                 })
                 .catch(err => console.error('Error fetching notifications:', err));
+        },
+        triggerToast(notif) {
+            this.toastNotif = notif;
+            this.toastOpen = true;
+            if (this.toastTimer) clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => {
+                this.toastOpen = false;
+            }, 8000); // Tutup otomatis setelah 8 detik
         },
         markAllRead() {
             fetch('{{ route('notifications.readAll') }}', {
@@ -103,5 +122,52 @@
                 </div>
             </template>
         </div>
+    </div>
+
+    <!-- Floating Toast Alert -->
+    <div x-show="toastOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="transform translate-y-10 opacity-0 scale-90"
+         x-transition:enter-end="transform translate-y-0 opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="transform translate-y-0 opacity-100 scale-100"
+         x-transition:leave-end="transform translate-y-10 opacity-0 scale-90"
+         class="fixed bottom-5 right-5 z-[9999] w-96 bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-indigo-100 p-4 flex gap-3 items-start select-none"
+         style="display: none;">
+        
+        <!-- Icon -->
+        <div class="flex-shrink-0 mt-0.5">
+            <template x-if="toastNotif && toastNotif.type === 'order'">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">📦</div>
+            </template>
+            <template x-if="toastNotif && toastNotif.type === 'promo'">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-lg">🔥</div>
+            </template>
+            <template x-if="toastNotif && toastNotif.type === 'recommendation'">
+                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-lg">✨</div>
+            </template>
+            <template x-if="toastNotif && toastNotif.type !== 'order' && toastNotif.type !== 'promo' && toastNotif.type !== 'recommendation'">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg">ℹ️</div>
+            </template>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-sm text-gray-800" x-text="toastNotif ? toastNotif.title : ''"></h4>
+            <p class="text-xs text-gray-600 leading-relaxed mt-1" x-text="toastNotif ? toastNotif.message : ''"></p>
+            
+            <!-- Refresh Action Button (Only on /account or /admin/orders or /admin/dashboard or /dashboard) -->
+            <template x-if="window.location.pathname === '/account' || window.location.pathname === '/admin/orders' || window.location.pathname === '/dashboard' || window.location.pathname === '/admin/dashboard'">
+                <button @click="window.location.reload()" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition shadow-sm hover:shadow">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12"/></svg>
+                    Perbarui Data Halaman
+                </button>
+            </template>
+        </div>
+
+        <!-- Close Button -->
+        <button @click="toastOpen = false" class="text-gray-400 hover:text-gray-600 transition p-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
     </div>
 </div>

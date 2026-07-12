@@ -624,3 +624,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+// ---- DYNAMIC SITEMAP FOR SEARCH ENGINES ----
+Route::get('/sitemap.xml', function () {
+    $books = App\Models\Book::all();
+    return response()->view('sitemap', compact('books'))
+        ->header('Content-Type', 'text/xml');
+});

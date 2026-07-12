@@ -94,7 +94,7 @@ BooSho adalah platform toko buku digital berbasis web yang dikembangkan mengguna
 
 ---
 
-## 📸 Dokumentasi Proyek
+## F. Dokumentasi Proyek
 
 ### Rancangan ERD Database
 

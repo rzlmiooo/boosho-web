@@ -3,7 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $book->title }} - Detail Buku</title>
+    <title>{{ $book->title }} - Detail Buku | BooSho</title>
+    <meta name="description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}. Stok tersedia: {{ $book->stock }}. Dapatkan buku digital berkualitas sekarang!">
+    <meta name="keywords" content="{{ $book->title }}, {{ $book->author }}, buku digital, ebook, beli buku {{ $book->title }}, boosho">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="{{ $book->title }} - Detail Buku | BooSho">
+    <meta property="og:description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}. Stok tersedia: {{ $book->stock }}.">
+    <meta property="og:image" content="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="book">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $book->title }} - Detail Buku | BooSho">
+    <meta name="twitter:description" content="Beli buku {{ $book->title }} karya {{ $book->author }} di BooSho. Harga: Rp {{ number_format($book->price, 0, ',', '.') }}.">
+    <meta name="twitter:image" content="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f' }}">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -23,7 +41,7 @@
     <!-- Navigasi -->
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></span>
             <div class="hidden md:flex gap-5">
                 <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>

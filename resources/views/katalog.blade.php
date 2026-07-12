@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Lengkap - BooSho</title>
+    <title>Katalog Lengkap Buku Digital - BooSho</title>
     <meta name="description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta name="keywords" content="katalog buku, ebook, daftar buku, perpustakaan digital, boosho">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="Katalog Lengkap Buku Digital - BooSho">
+    <meta property="og:description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Katalog Lengkap Buku Digital - BooSho">
+    <meta name="twitter:description" content="Temukan koleksi buku terlengkap di BooSho. Cari, filter, dan temukan buku favorit Anda dengan mudah.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -29,7 +46,7 @@
 
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></span>
             <div class="hidden md:flex gap-5">
                 <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 
@@ -97,7 +114,7 @@
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Katalog Buku</h2>
+                    <h1 class="text-2xl font-bold text-gray-800">Katalog Buku</h1>
                     <p class="text-sm text-gray-500 mt-0.5">
                         Menampilkan <span class="font-semibold text-indigo-600">{{ $books->count() }}</span>
                         dari <span class="font-semibold">{{ $totalBooks }}</span> total buku
