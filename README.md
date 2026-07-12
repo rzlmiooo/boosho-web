@@ -16,12 +16,12 @@ Web Toko Buku Digital berbasis web yang dikembangkan menggunakan framework Larav
 
 **Kelompok 4**
 
-* **Ketua**: Rizal Maulana (2305101018)
+* **Ketua**: Rizal Maulana (2305101018) @rzlmiooo
 * **Anggota**:
-  1. Reza Fairul Nizam (2305101022)
-  2. M. Wahyue Nesaputro (2305102243)
-  3. Sofyan Dwi Saputro (2305101003)
-  4. Rivan Wahyu Mardoni (2305101014)
+  1. Reza Fairul Nizam (2305101022) @EzaMasterpis
+  2. M. Wahyue Nesaputro (2305102243) @wahyuenesaputro
+  3. Sofyan Dwi Saputro (2305101003) @SOPYANDS
+  4. Rivan Wahyu Mardoni (2305101014) @RivanWhyu
 
 ---
 
@@ -106,16 +106,20 @@ Web Toko Buku Digital berbasis web yang dikembangkan menggunakan framework Larav
 
 ### Rancangan ERD Database
 
-`[Tempat ERD Proyek / Placeholder Gambar ERD]`
+<img width="5684" height="5728" alt="erd drawio" src="https://github.com/user-attachments/assets/4151e03b-dc92-4cad-a619-2a5013afafe2" />
 
-### Halaman Utama / Katalog Buku
+### Halaman Utama 
 
-`[Tempat Screenshot Katalog / Placeholder Gambar Katalog]`
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/c68d944b-99dd-4787-81df-4ba274259ad2" />
+
+### Katalog Buku
+
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/47904e91-a191-4642-9e00-7e57f714a7ac" />
 
 ### Keranjang Belanja & Fitur Pinpoint Alamat Otomatis
 
-`[Tempat Screenshot Peta Pengiriman / Placeholder Gambar Peta]`
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/9fa30ca5-6dc8-4c3c-b7aa-ce24c3a7bf19" />
 
-### Dropdown Notifikasi & Dashboard Admin
+### Tracking Pesanan
 
-`[Tempat Screenshot Notifikasi & Admin / Placeholder Gambar Notifikasi]`
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/a1bf250d-acee-4aea-b10b-c532cca9ceb0" />
