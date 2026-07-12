@@ -16,7 +16,7 @@
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 <a href="{{ route('katalog') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Katalog Buku</a>
 
                 @if(Auth::user()->isAdmin())
@@ -110,7 +110,7 @@
                         <div class="p-4 flex flex-col gap-3">
                             @foreach($carts as $cart)
                             @php 
-                                $subtotal = $cart->book->price * $cart->quantity;
+                                $subtotal = $cart->book->discounted_price * $cart->quantity;
                                 $totalHarga += $subtotal; 
                             @endphp
                             <div class="flex flex-col sm:flex-row sm:items-center gap-4 border border-gray-100 rounded-xl p-4 hover:border-indigo-100 hover:bg-indigo-50/20 transition">
@@ -128,7 +128,12 @@
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-indigo-600 text-sm truncate">{{ $cart->book->title }}</h3>
                                         <p class="text-xs text-gray-400">{{ $cart->book->author }}</p>
-                                        <p class="text-xs text-gray-500 font-semibold mt-0.5">Rp {{ number_format($cart->book->price, 0, ',', '.') }} / buku</p>
+                                        @if($cart->book->discounted_price < $cart->book->price)
+                                            <span class="text-[10px] text-gray-400 line-through">Rp {{ number_format($cart->book->price, 0, ',', '.') }}</span>
+                                            <p class="text-xs text-red-500 font-bold">Rp {{ number_format($cart->book->discounted_price, 0, ',', '.') }} / buku</p>
+                                        @else
+                                            <p class="text-xs text-gray-500 font-semibold mt-0.5">Rp {{ number_format($cart->book->price, 0, ',', '.') }} / buku</p>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -177,7 +182,7 @@
 
                         <div class="space-y-2 mb-4">
                             @foreach($carts as $cart)
-                            @php $s = $cart->book->price * $cart->quantity; @endphp
+                            @php $s = $cart->book->discounted_price * $cart->quantity; @endphp
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-gray-500 truncate max-w-[140px]">{{ $cart->book->title }} (×{{ $cart->quantity }})</span>
                                 <span class="text-gray-700 font-semibold flex-shrink-0 ml-2">Rp {{ number_format($s, 0, ',', '.') }}</span>

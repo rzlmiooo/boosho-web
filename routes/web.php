@@ -65,11 +65,44 @@ Route::get('/katalog', function (Request $request) {
 // ---- HALAMAN DETAIL BUKU (PUBLIK) ----
 Route::get('/books/{id}', function ($id) {
     $book = App\Models\Book::findOrFail($id);
+    
+    // Simpan history 3 buku terakhir yang dilihat user ke session
+    $recentlyViewed = session()->get('recently_viewed', []);
+    // Hapus id jika sudah ada untuk memindahkannya ke antrean teratas
+    if (($key = array_search($id, $recentlyViewed)) !== false) {
+        unset($recentlyViewed[$key]);
+    }
+    array_unshift($recentlyViewed, $id);
+    $recentlyViewed = array_slice($recentlyViewed, 0, 3);
+    session()->put('recently_viewed', $recentlyViewed);
+
     return view('detail', compact('book')); 
 });
 
+// ---- API ENDPOINT FITUR REVIEW JSON (UNTUK MODAL/POP-UP) ----
+Route::get('/api/books/{id}/reviews', function ($id) {
+    $book = App\Models\Book::findOrFail($id);
+    $reviews = $book->reviews()->with('user')->latest()->get()->map(function($review) {
+        return [
+            'id' => $review->id,
+            'user_name' => $review->user->name,
+            'rating' => $review->rating,
+            'comment' => $review->comment,
+            'sentiment' => $review->sentiment,
+            'created_at_human' => $review->created_at->diffForHumans()
+        ];
+    });
+    
+    return response()->json([
+        'book_title' => $book->title,
+        'average_rating' => $book->average_rating,
+        'total_reviews' => $reviews->count(),
+        'reviews' => $reviews
+    ]);
+});
+
 // ---- FITUR REVIEW BUKU (GET - PUBLIK) ----
-Route::get('/books/{id}/reviews', function (Request $request, $id) {
+Route::get('/books/{id}/reviews', function (Illuminate\Http\Request $request, $id) {
     $book = Book::findOrFail($id);
     
     // Cek apakah ada request pengurutan dari URL (?sort=terlama)
@@ -100,8 +133,59 @@ Route::middleware('auth')->group(function () {
             });
             return view('admin.dashboard', compact('latestBooks', 'totalBooks', 'totalStock', 'totalValue'));
         }
-        $previewBooks = Book::latest()->take(4)->get();
-        return view('dashboard', compact('previewBooks'));
+
+        $now = now();
+        // 1. Rilisan Terbaru
+        $latestBooks = Book::latest()->take(4)->get();
+
+        // 2. Promo Diskon (Diskon aktif berdasarkan rentang waktu)
+        $discountedBooks = Book::where('discount_percent', '>', 0)
+            ->where(fn($q) => $q->whereNull('discount_start')->orWhere('discount_start', '<=', $now))
+            ->where(fn($q) => $q->whereNull('discount_end')->orWhere('discount_end', '>=', $now))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // 3. Rekomendasi Pintar (Berdasarkan 3 buku terakhir dilihat)
+        $recentlyViewed = session()->get('recently_viewed', []);
+        $recommendedBooks = collect();
+
+        if (!empty($recentlyViewed)) {
+            $viewedBooks = Book::whereIn('id', $recentlyViewed)->get();
+            $categories = $viewedBooks->pluck('category')->filter()->unique()->toArray();
+            $genres = [];
+            foreach ($viewedBooks as $vb) {
+                if ($vb->genres) {
+                    $genres = array_merge($genres, $vb->genres);
+                }
+            }
+            $genres = array_unique($genres);
+
+            $query = Book::whereNotIn('id', $recentlyViewed);
+            if (!empty($categories) || !empty($genres)) {
+                $query->where(function($q) use ($categories, $genres) {
+                    if (!empty($categories)) {
+                        $q->orWhereIn('category', $categories);
+                    }
+                    if (!empty($genres)) {
+                        foreach ($genres as $genre) {
+                            $q->orWhereJsonContains('genres', $genre);
+                        }
+                    }
+                });
+            }
+            $recommendedBooks = $query->latest()->take(4)->get();
+        }
+
+        // Genapi dengan buku acak jika rekomendasi < 4
+        if ($recommendedBooks->count() < 4) {
+            $excludeIds = array_merge($recentlyViewed, $recommendedBooks->pluck('id')->toArray());
+            $padCount = 4 - $recommendedBooks->count();
+            $padBooks = Book::whereNotIn('id', $excludeIds)->inRandomOrder()->take($padCount)->get();
+            $recommendedBooks = $recommendedBooks->concat($padBooks);
+        }
+
+        return view('dashboard', compact('recommendedBooks', 'latestBooks', 'discountedBooks'));
     })->name('dashboard');
 
     // ---- CRUD BUKU ADMIN ----
@@ -275,11 +359,11 @@ Route::middleware('auth')->group(function () {
                     'order_id' => $order->id,
                     'book_id' => $book->id,
                     'quantity' => $qtyToBuy,
-                    'price' => $book->price // Kunci harga saat beli
+                    'price' => $book->discounted_price // Kunci harga saat beli (menggunakan harga diskon jika ada)
                 ]);
 
                 // Hitung total harga
-                $totalPrice += ($book->price * $qtyToBuy);
+                $totalPrice += ($book->discounted_price * $qtyToBuy);
 
                 // 3. Kurangi stok buku & hapus keranjang
                 $book->decrement('stock', $qtyToBuy);
@@ -368,6 +452,8 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('success', 'Kode pembayaran berhasil dikirim!');
     });
+
+    Route::post('admin/books/batch-discount', [AdminBookController::class, 'batchDiscount'])->name('admin.books.batch-discount');
 
     // Resource CRUD Buku Admin
     Route::resource('admin/books', AdminBookController::class)->names([

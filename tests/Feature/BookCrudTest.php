@@ -94,4 +94,47 @@ class BookCrudTest extends TestCase
         // Verify that the new cover was stored on public disk
         Storage::disk('public')->assertExists($book->cover);
     }
+
+    public function test_admin_can_set_batch_discount()
+    {
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@boosho.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin'
+        ]);
+
+        $book1 = Book::create([
+            'title' => 'Buku Uji 1',
+            'author' => 'Penulis 1',
+            'price' => 100000,
+            'stock' => 5,
+            'description' => 'Deskripsi 1.'
+        ]);
+
+        $book2 = Book::create([
+            'title' => 'Buku Uji 2',
+            'author' => 'Penulis 2',
+            'price' => 200000,
+            'stock' => 10,
+            'description' => 'Deskripsi 2.'
+        ]);
+
+        $response = $this->actingAs($admin)->post('/admin/books/batch-discount', [
+            'book_ids' => [$book1->id, $book2->id],
+            'discount_percent' => 25,
+            'discount_start' => now()->subHour()->toDateTimeString(),
+            'discount_end' => now()->addDay()->toDateTimeString()
+        ]);
+
+        $response->assertRedirect();
+        
+        $book1->refresh();
+        $book2->refresh();
+
+        $this->assertEquals(25, $book1->discount_percent);
+        $this->assertEquals(25, $book2->discount_percent);
+        $this->assertEquals(75000, $book1->discounted_price);
+        $this->assertEquals(150000, $book2->discounted_price);
+    }
 }

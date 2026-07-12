@@ -31,7 +31,7 @@
         <div class="flex items-center gap-8">
             <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">BooSho<span class="text-indigo-400">.</span></h1>
             <div class="hidden md:flex gap-5">
-                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition">Home</a>
                 
                 <a href="{{ route('katalog') }}" class="text-sm font-semibold text-indigo-600 border-b-2 border-indigo-500 pb-0.5">Katalog Buku</a>
 
@@ -345,26 +345,29 @@
 
                                 {{-- Bagian Bawah: Harga, Stok, & Tombol --}}
                                 <div class="mt-6">
-                                    {{-- Divider border-t dan layout Harga & Stok --}}
+                                    {{-- Divider border-t dan layout Harga & Review --}}
                                     <div class="border-t border-gray-100 pt-5 mb-5 flex items-center justify-between">
-                                        <span class="font-extrabold text-xl text-gray-900 tracking-tight">
-                                            Rp {{ number_format($book->price, 0, ',', '.') }}
-                                        </span>
+                                        <div class="flex flex-col">
+                                            @if($book->discounted_price < $book->price)
+                                                <div class="flex items-center gap-2 mb-0.5">
+                                                    <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                                    <span class="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">{{ $book->discount_percent }}% OFF</span>
+                                                </div>
+                                                <span class="font-extrabold text-xl text-red-600 tracking-tight">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</span>
+                                            @else
+                                                <span class="font-extrabold text-xl text-gray-900 tracking-tight">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
+                                            @endif
+                                        </div>
                                         
-                                        @if($book->stock > 0)
-                                            <span class="text-xs bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0] font-bold px-3 py-1.5 rounded-full">
-                                                Stok: {{ $book->stock }}
-                                            </span>
-                                        @else
-                                            <span class="text-xs bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-full">
-                                                Habis
-                                            </span>
-                                        @endif
+                                        <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-3 py-1.5 rounded-full transition group shadow-sm">
+                                            <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
+                                            <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
+                                        </button>
                                     </div>
 
                                     {{-- Susunan Tombol --}}
                                     @if(Auth::check() && Auth::user()->isAdmin())
-                                        <div class="flex gap-2">
+                                        <div class="flex gap-2 relative">
                                             <a href="/books/{{ $book->id }}/edit" class="w-1/2 text-center bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold text-[15px] py-3 rounded-xl transition shadow-sm">Edit</a>
                                             <button type="button" onclick="konfirmasiHapus({{ $book->id }})" class="w-1/2 text-[15px] text-red-600 bg-red-50 font-bold hover:bg-red-500 hover:text-white border border-red-200 py-3 rounded-xl transition shadow-sm">Hapus</button>
                                         </div>
@@ -374,20 +377,25 @@
                                                 Detail Buku
                                             </a>
                                             
-                                            @if($book->stock > 0)
-                                                <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[15px] py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                                    + Keranjang
-                                                </button>
-                                            @else
-                                                <button disabled class="w-full bg-gray-100 text-gray-400 font-bold text-[15px] py-3 rounded-xl cursor-not-allowed">
-                                                    Stok Habis
-                                                </button>
-                                            @endif
+                                            <div class="relative">
+                                                @if($book->stock > 0)
+                                                    <button type="button" onclick="tambahKeKeranjang({{ $book->id }})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[15px] py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                        + Keranjang
+                                                    </button>
+                                                    <div class="absolute -top-2.5 -right-2 bg-green-100 border border-green-200 text-green-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">
+                                                        Stok: {{ $book->stock }}
+                                                    </div>
+                                                @else
+                                                    <button type="button" disabled class="w-full bg-gray-100 text-gray-400 font-bold text-[15px] py-3 rounded-xl cursor-not-allowed border border-gray-200 flex items-center justify-center gap-2">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                        Stok Habis
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endif
                                 </div>
-                                
                             </div>
                             @endforeach
                         </div>
@@ -579,6 +587,151 @@
                 }
             });
         }
+    </script>
+
+    {{-- ===== MODAL REVIEW BUKU (Global Alpine.js Component) ===== --}}
+    <div x-data="reviewModal()" @open-review.window="open($event.detail.id)" x-show="isOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center">
+        <!-- Backdrop -->
+        <div x-show="isOpen" x-transition.opacity class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="close()"></div>
+        
+        <!-- Modal Content -->
+        <div x-show="isOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+             class="relative bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 line-clamp-1" x-text="'Ulasan: ' + bookTitle">Ulasan Buku</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-yellow-400 text-sm">⭐</span>
+                        <span class="text-sm font-bold text-gray-700" x-text="averageRating + ' rata-rata'"></span>
+                        <span class="text-sm text-gray-400" x-text="'(' + totalReviews + ' ulasan)'"></span>
+                    </div>
+                </div>
+                <button @click="close()" class="p-2 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-4 z-10">
+                <!-- Rating Filter -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Bintang:</span>
+                    <select x-model="filterRating" class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua</option>
+                        <option value="5">5 Bintang</option>
+                        <option value="4">4 Bintang</option>
+                        <option value="3">3 Bintang</option>
+                        <option value="2">2 Bintang</option>
+                        <option value="1">1 Bintang</option>
+                    </select>
+                </div>
+                
+                <!-- Sentiment Filter -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori NLP:</span>
+                    <select x-model="filterSentiment" class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua Sentimen</option>
+                        <option value="positif">Positif</option>
+                        <option value="kritis">Kritis</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Content Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                <!-- Loading State -->
+                <div x-show="isLoading" class="flex flex-col items-center justify-center py-12">
+                    <svg class="w-10 h-10 text-indigo-500 animate-spin mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-sm font-medium text-gray-500">Memuat ulasan NLP...</span>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="!isLoading && filteredReviews.length === 0" class="flex flex-col items-center justify-center py-12 text-center" style="display: none;">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-4">😶</div>
+                    <h3 class="text-gray-900 font-bold mb-1">Tidak ada ulasan ditemukan</h3>
+                    <p class="text-sm text-gray-500">Cobalah mengubah filter pencarian Anda.</p>
+                </div>
+
+                <!-- Reviews List -->
+                <div x-show="!isLoading && filteredReviews.length > 0" class="space-y-4" style="display: none;">
+                    <template x-for="review in filteredReviews" :key="review.id">
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm" x-text="review.user_name"></h4>
+                                    <span class="text-xs text-gray-400" x-text="review.created_at_human"></span>
+                                </div>
+                                <div class="flex flex-col items-end gap-1.5">
+                                    <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full border border-yellow-200">
+                                        ⭐ <span x-text="review.rating + '/5'"></span>
+                                    </span>
+                                    <span :class="review.sentiment === 'positif' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide border">
+                                        NLP: <span x-text="review.sentiment"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed" x-text="review.comment"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('reviewModal', () => ({
+                isOpen: false,
+                isLoading: false,
+                bookTitle: '',
+                averageRating: 0,
+                totalReviews: 0,
+                reviews: [],
+                filterRating: 'all',
+                filterSentiment: 'all',
+                
+                open(id) {
+                    this.isOpen = true;
+                    this.isLoading = true;
+                    this.reviews = [];
+                    // Reset filters when opening new book
+                    this.filterRating = 'all';
+                    this.filterSentiment = 'all';
+                    
+                    fetch('/api/books/' + id + '/reviews')
+                        .then(res => res.json())
+                        .then(data => {
+                            this.bookTitle = data.book_title;
+                            this.averageRating = data.average_rating;
+                            this.totalReviews = data.total_reviews;
+                            this.reviews = data.reviews;
+                            this.isLoading = false;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            this.isLoading = false;
+                        });
+                },
+                close() {
+                    this.isOpen = false;
+                },
+                get filteredReviews() {
+                    return this.reviews.filter(review => {
+                        const matchRating = this.filterRating === 'all' || review.rating.toString() === this.filterRating;
+                        const matchSentiment = this.filterSentiment === 'all' || review.sentiment === this.filterSentiment;
+                        return matchRating && matchSentiment;
+                    });
+                }
+            }));
+        });
     </script>
 </body>
 </html>
