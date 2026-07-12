@@ -47,7 +47,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($books as $book)
-                        <tr class="hover:bg-gray-50/50 transition">
+                        <tr class="book-row hover:bg-gray-50/50 transition cursor-pointer">
                             <td class="px-6 py-4">
                                 <input type="checkbox" name="book_ids[]" value="{{ $book->id }}" class="book-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer">
                             </td>
@@ -219,6 +219,20 @@
 
     checkboxes.forEach(cb => {
         cb.addEventListener('change', updateBatchButton);
+    });
+
+    // Toggle checkbox when clicking a table row (excluding interactive children)
+    document.querySelectorAll('.book-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (e.target.closest('a, button, input')) {
+                return;
+            }
+            const checkbox = this.querySelector('.book-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        });
     });
 
     function konfirmasiHapus(id) {

@@ -13,7 +13,7 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     @php
         if (!isset($orders)) {

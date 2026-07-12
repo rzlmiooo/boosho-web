@@ -10,7 +10,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style> body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; } </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">

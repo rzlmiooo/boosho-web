@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - BooSho</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" x-data>
 
     <nav class="bg-white/90 backdrop-blur shadow-sm px-6 py-3 flex justify-between items-center border-b border-indigo-100 sticky top-0 z-50">
         <div class="flex items-center gap-8">
@@ -193,7 +193,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($latestBooks as $book)
-                    <div class="border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden relative">
+                    <div onclick="window.location='/books/{{ $book->id }}'" class="cursor-pointer border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden relative">
                         <!-- 'New' Badge -->
                         <span class="absolute top-3 right-3 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm uppercase tracking-wide">
                             Baru
@@ -241,14 +241,14 @@
                                             <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->price, 0, ',', '.') }}</p>
                                         @endif
                                     </div>
-                                    <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
+                                    <button type="button" @click.stop="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
                                         <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
                                         <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
                                     </button>
                                 </div>
 
                                 <div class="pt-3 border-t border-gray-100 relative">
-                                    <a href="/books/{{ $book->id }}" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
+                                    <a href="/books/{{ $book->id }}" onclick="event.stopPropagation()" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
                                         Lihat Detail
                                     </a>
                                     @if($book->stock > 0)
@@ -282,7 +282,7 @@
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach($discountedBooks as $book)
-                        <div class="border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden relative">
+                        <div onclick="window.location='/books/{{ $book->id }}'" class="cursor-pointer border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden relative">
                             <!-- Discount Badge -->
                             <span class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full z-10 shadow-sm uppercase tracking-wide animate-pulse">
                                 {{ $book->discount_percent }}% OFF
@@ -326,14 +326,14 @@
                                             <span class="text-xs text-gray-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
                                             <p class="font-bold text-red-500 text-sm">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</p>
                                         </div>
-                                        <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
+                                        <button type="button" @click.stop="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
                                             <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
                                             <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
                                         </button>
                                     </div>
 
                                     <div class="pt-3 border-t border-gray-100 relative">
-                                        <a href="/books/{{ $book->id }}" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
+                                        <a href="/books/{{ $book->id }}" onclick="event.stopPropagation()" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
                                             Lihat Detail
                                         </a>
                                         @if($book->stock > 0)
@@ -411,18 +411,55 @@
                 </div>
                 
                 <!-- Sentiment Filter -->
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori NLP:</span>
-                    <select x-model="filterSentiment" class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="all">Semua Sentimen</option>
-                        <option value="positif">Positif</option>
-                        <option value="kritis">Kritis</option>
-                    </select>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori:</span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="showPositif = !showPositif" :class="showPositif ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Positif
+                        </button>
+                        <button type="button" @click="showKritis = !showKritis" :class="showKritis ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                            Negatif
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Content Body (Scrollable) -->
             <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                @if(Auth::check() && Auth::user()->role === 'user')
+                <!-- Tulis Ulasan Form -->
+                <div class="mb-5">
+                    <button @click="showWriteForm = !showWriteForm" class="w-full flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2.5 px-4 rounded-xl border border-indigo-100 transition text-sm">
+                        <span x-text="showWriteForm ? '✕ Batal Menulis Ulasan' : '✍️ Tulis Ulasan Baru'"></span>
+                    </button>
+                    
+                    <div x-show="showWriteForm" x-transition class="mt-3 bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm">
+                        <form :action="'/books/' + bookId + '/reviews'" method="POST" class="flex flex-col gap-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Rating Bintang</label>
+                                <select name="rating" required class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5) Sangat Bagus</option>
+                                    <option value="4">⭐⭐⭐⭐ (4) Bagus</option>
+                                    <option value="3">⭐⭐⭐ (3) Lumayan</option>
+                                    <option value="2">⭐⭐ (2) Buruk</option>
+                                    <option value="1">⭐ (1) Sangat Buruk</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Komentar</label>
+                                <textarea name="comment" rows="3" required placeholder="Bagaimana menurutmu tentang buku ini?" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+                                    Kirim Ulasan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Loading State -->
                 <div x-show="isLoading" class="flex flex-col items-center justify-center py-12">
                     <svg class="w-10 h-10 text-indigo-500 animate-spin mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -467,20 +504,26 @@
             Alpine.data('reviewModal', () => ({
                 isOpen: false,
                 isLoading: false,
+                bookId: null,
+                showWriteForm: false,
                 bookTitle: '',
                 averageRating: 0,
                 totalReviews: 0,
                 reviews: [],
                 filterRating: 'all',
-                filterSentiment: 'all',
+                showPositif: true,
+                showKritis: true,
                 
                 open(id) {
                     this.isOpen = true;
                     this.isLoading = true;
+                    this.bookId = id;
+                    this.showWriteForm = false;
                     this.reviews = [];
                     // Reset filters when opening new book
                     this.filterRating = 'all';
-                    this.filterSentiment = 'all';
+                    this.showPositif = true;
+                    this.showKritis = true;
                     
                     fetch('/api/books/' + id + '/reviews')
                         .then(res => res.json())
@@ -502,7 +545,14 @@
                 get filteredReviews() {
                     return this.reviews.filter(review => {
                         const matchRating = this.filterRating === 'all' || review.rating.toString() === this.filterRating;
-                        const matchSentiment = this.filterSentiment === 'all' || review.sentiment === this.filterSentiment;
+                        const showAllSentiment = !this.showPositif && !this.showKritis;
+                        let matchSentiment = false;
+                        if (showAllSentiment) {
+                            matchSentiment = true;
+                        } else {
+                            if (this.showPositif && review.sentiment === 'positif') matchSentiment = true;
+                            if (this.showKritis && review.sentiment === 'kritis') matchSentiment = true;
+                        }
                         return matchRating && matchSentiment;
                     });
                 }
