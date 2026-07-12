@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
         [x-cloak] { display: none !important; }
@@ -215,6 +217,16 @@
                                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                                                     Menunggu Pembayaran
                                                 </span>
+                                            @elseif($order->status === 'packing')
+                                                <span class="inline-flex items-center gap-1.5 text-xs bg-orange-50 text-orange-700 border border-orange-200 font-bold px-3 py-1.5 rounded-full">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                                                    Sedang Dikemas
+                                                </span>
+                                            @elseif($order->status === 'shipping')
+                                                <span class="inline-flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-3 py-1.5 rounded-full">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                                                    Dalam Pengiriman
+                                                </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1.5 text-xs bg-green-50 text-green-700 border border-green-200 font-bold px-3 py-1.5 rounded-full">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -223,6 +235,92 @@
                                             @endif
                                         </div>
                                     </div>
+
+                                    <!-- Timeline Tracking Pengiriman -->
+                                    <div class="mt-2 mb-6 bg-gray-50 border border-gray-100 rounded-2xl p-5">
+                                        <div class="flex items-center justify-between text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-4">
+                                            <span>Status Pelacakan Logistik</span>
+                                            @if($order->shipping_resi)
+                                                <span class="text-indigo-600 normal-case font-mono bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">No. Resi: {{ $order->shipping_resi }}</span>
+                                            @endif
+                                        </div>
+                                        
+                                        <!-- Timeline Steps -->
+                                        <div class="relative flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+                                            <!-- Background connecting line -->
+                                            <div class="absolute left-1/2 md:left-0 md:top-5 w-0.5 md:w-full h-[80%] md:h-0.5 bg-gray-200 -translate-x-1/2 md:translate-x-0 z-0"></div>
+                                            
+                                            @php
+                                                $step1Active = in_array($order->status, ['pending', 'waiting_payment', 'packing', 'shipping', 'completed']);
+                                                $step2Active = in_array($order->status, ['waiting_payment', 'packing', 'shipping', 'completed']);
+                                                $step3Active = in_array($order->status, ['packing', 'shipping', 'completed']);
+                                                $step4Active = in_array($order->status, ['shipping', 'completed']);
+                                                $step5Active = $order->status === 'completed';
+                                            @endphp
+                                            
+                                            <!-- Step 1: Pesanan Dibuat -->
+                                            <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step1Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
+                                                    📄
+                                                </div>
+                                                <span class="text-[10px] font-bold mt-2 {{ $step1Active ? 'text-indigo-700' : 'text-gray-400' }}">Dibuat</span>
+                                            </div>
+                                            
+                                            <!-- Step 2: Menunggu Bayar -->
+                                            <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step2Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
+                                                    💳
+                                                </div>
+                                                <span class="text-[10px] font-bold mt-2 {{ $step2Active ? 'text-indigo-700' : 'text-gray-400' }}">Bayar</span>
+                                            </div>
+                                            
+                                            <!-- Step 3: Sedang Dikemas -->
+                                            <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step3Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
+                                                    📦
+                                                </div>
+                                                <span class="text-[10px] font-bold mt-2 {{ $step3Active ? 'text-indigo-700' : 'text-gray-400' }}">Dikemas</span>
+                                            </div>
+                                            
+                                            <!-- Step 4: Dalam Pengiriman -->
+                                            <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step4Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
+                                                    🚚
+                                                </div>
+                                                <span class="text-[10px] font-bold mt-2 {{ $step4Active ? 'text-indigo-700' : 'text-gray-400' }}">Dikirim</span>
+                                            </div>
+                                            
+                                            <!-- Step 5: Selesai -->
+                                            <div class="relative z-10 flex flex-col items-center md:w-1/5 text-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300 {{ $step5Active ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400' }}">
+                                                    🏁
+                                                </div>
+                                                <span class="text-[10px] font-bold mt-2 {{ $step5Active ? 'text-indigo-700' : 'text-gray-400' }}">Diterima</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Alamat & Peta Pinpoint -->
+                                    @if($order->address)
+                                        <div x-data="{ openMap: false }" class="mt-4 mb-5 border border-gray-100 rounded-2xl overflow-hidden bg-white">
+                                            <button @click="openMap = !openMap; $nextTick(() => { if(openMap) initOrderMap({{ $order->id }}, {{ $order->latitude }}, {{ $order->longitude }}) })" class="w-full flex justify-between items-center px-4 py-3 bg-gray-50/50 hover:bg-gray-50 transition text-xs font-bold text-gray-600">
+                                                <span class="flex items-center gap-1.5">📍 Lihat Detail Alamat & Lokasi Pengiriman</span>
+                                                <svg class="w-4 h-4 transition-transform duration-200" :class="openMap ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openMap" x-cloak class="p-4 border-t border-gray-50 space-y-3">
+                                                <div>
+                                                    <span class="block text-[10px] text-gray-400 font-bold uppercase mb-1">Alamat Penerima</span>
+                                                    <p class="text-sm text-gray-750 leading-relaxed">{{ $order->address }}</p>
+                                                </div>
+                                                @if($order->latitude && $order->longitude)
+                                                    <div>
+                                                        <span class="block text-[10px] text-gray-400 font-bold uppercase mb-1.5">Koordinat Pinpoint</span>
+                                                        <div id="order-map-{{ $order->id }}" class="h-48 rounded-xl border border-gray-200 z-10"></div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     <div class="flex flex-col gap-3 mb-4">
                                         @foreach($order->items as $item)
@@ -265,11 +363,27 @@
                                                     Menunggu admin generate kode pembayaran
                                                 </p>
                                             </div>
+                                        @elseif($order->status === 'packing')
+                                            <div class="w-full sm:w-auto">
+                                                <p class="text-xs text-orange-600 font-medium flex items-center gap-1.5 bg-orange-50 border border-orange-150 px-3 py-2 rounded-lg">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                                    Pembayaran Sukses! Buku sedang dikemas oleh admin.
+                                                </p>
+                                            </div>
+                                        @elseif($order->status === 'shipping')
+                                            <div class="w-full sm:w-auto flex items-center gap-3">
+                                                <form action="/orders/{{ $order->id }}/receive" method="POST" id="receive-form-{{ $order->id }}">
+                                                    @csrf
+                                                    <button type="button" onclick="konfirmasiTerima({{ $order->id }})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm active:scale-95 whitespace-nowrap">
+                                                        Konfirmasi Barang Diterima
+                                                    </button>
+                                                </form>
+                                            </div>
                                         @else
                                             <div class="w-full sm:w-auto">
                                                 <p class="text-xs text-green-600 font-medium flex items-center gap-1.5">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                    Pembayaran Lunas
+                                                    Pesanan Selesai / Diterima
                                                 </p>
                                             </div>
                                         @endif
@@ -295,6 +409,9 @@
     </div>
 
     <script>
+        @if(session('success')) Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session("success") }}', showConfirmButton: false, timer: 1800 }); @endif
+        @if(session('error')) Swal.fire({ icon: 'error', title: 'Oops!', text: '{{ session("error") }}', confirmButtonColor: '#4f46e5' }); @endif
+
         function konfirmasiLogout() {
             Swal.fire({
                 title: 'Logout?', icon: 'warning', showCancelButton: true,
@@ -311,6 +428,34 @@
                 confirmButtonColor: '#16a34a', cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, Saya Sudah Bayar!', cancelButtonText: 'Batal'
             }).then((r) => { if (r.isConfirmed) document.getElementById('pay-form-' + orderId).submit(); })
+        }
+
+        function konfirmasiTerima(orderId) {
+            Swal.fire({
+                title: '📦 Konfirmasi Barang Diterima',
+                text: "Apakah Anda yakin pesanan telah sampai dan Anda telah menerima barang dengan baik?",
+                icon: 'question', showCancelButton: true,
+                confirmButtonColor: '#4f46e5', cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Sudah Diterima!', cancelButtonText: 'Batal'
+            }).then((r) => { if (r.isConfirmed) document.getElementById('receive-form-' + orderId).submit(); })
+        }
+
+        const activeMaps = {};
+        function initOrderMap(orderId, lat, lng) {
+            if (activeMaps[orderId]) {
+                setTimeout(() => activeMaps[orderId].invalidateSize(), 100);
+                return;
+            }
+            setTimeout(() => {
+                let mapDivId = 'order-map-' + orderId;
+                let oMap = L.map(mapDivId).setView([lat, lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(oMap);
+                
+                L.marker([lat, lng]).addTo(oMap);
+                activeMaps[orderId] = oMap;
+            }, 150);
         }
     </script>
 </body>

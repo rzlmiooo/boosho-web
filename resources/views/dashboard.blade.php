@@ -114,7 +114,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($recommendedBooks as $book)
-                    <div class="border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden">
+                    <div onclick="window.location='/books/{{ $book->id }}'" class="cursor-pointer border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition duration-300 bg-white flex flex-col group overflow-hidden">
                         <div class="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden flex items-center justify-center">
                             @if($book->cover)
                                 <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover {{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
@@ -157,14 +157,14 @@
                                             <p class="font-bold text-indigo-600 text-sm">Rp {{ number_format($book->price, 0, ',', '.') }}</p>
                                         @endif
                                     </div>
-                                    <button type="button" @click="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
+                                    <button type="button" @click.stop="$dispatch('open-review', { id: {{ $book->id }} })" class="flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full transition group shadow-sm">
                                         <span class="text-yellow-500 group-hover:scale-110 transition-transform">⭐</span>
                                         <span class="text-xs font-bold text-yellow-700">{{ $book->average_rating > 0 ? $book->average_rating : 'Baru' }}</span>
                                     </button>
                                 </div>
 
                                 <div class="pt-3 border-t border-gray-100 relative">
-                                    <a href="/books/{{ $book->id }}" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
+                                    <a href="/books/{{ $book->id }}" onclick="event.stopPropagation()" class="block w-full text-center py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition">
                                         Lihat Detail
                                     </a>
                                     @if($book->stock > 0)

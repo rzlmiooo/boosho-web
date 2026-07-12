@@ -330,6 +330,9 @@ Route::middleware('auth')->group(function () {
         $request->validate([
             'quantities' => 'required|array',
             'quantities.*' => 'required|integer|min:1',
+            'address' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
 
         Illuminate\Support\Facades\DB::beginTransaction(); 
@@ -340,7 +343,10 @@ Route::middleware('auth')->group(function () {
                 'user_id' => Auth::id(),
                 'status' => 'pending', // Status awal
                 'payment_code' => 'VA' . rand(10000000, 99999999), // Generate kode VA dummy/otomatis
-                'total_price' => 0 // Set 0 dulu, nanti dihitung
+                'total_price' => 0, // Set 0 dulu, nanti dihitung
+                'address' => $request->address,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
             ]);
 
             $totalPrice = 0;
@@ -420,8 +426,38 @@ Route::middleware('auth')->group(function () {
         if ($order->status !== 'waiting_payment') {
             return back()->with('error', 'Status pesanan tidak valid untuk pembayaran.');
         }
+        $order->update(['status' => 'packing']);
+        return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan kini sedang dikemas.');
+    });
+
+    // Konfirmasi Barang Diterima oleh User
+    Route::post('/orders/{id}/receive', function ($id) {
+        $order = App\Models\Order::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        if ($order->status !== 'shipping') {
+            return back()->with('error', 'Status pesanan tidak valid untuk konfirmasi penerimaan.');
+        }
         $order->update(['status' => 'completed']);
-        return back()->with('success', 'Pembayaran berhasil disimulasikan!');
+        return back()->with('success', 'Pesanan selesai! Terima kasih telah berbelanja di BooSho.');
+    });
+
+    // Proses Pengiriman oleh Admin (Input Resi)
+    Route::post('/admin/orders/{id}/ship', function (Illuminate\Http\Request $request, $id) {
+        if(Auth::user()->role !== 'admin') abort(403);
+        
+        $request->validate([
+            'shipping_resi' => 'required|string|max:255'
+        ]);
+
+        $order = App\Models\Order::findOrFail($id);
+        if ($order->status !== 'packing') {
+            return back()->with('error', 'Status pesanan tidak valid untuk pengiriman.');
+        }
+        $order->update([
+            'shipping_resi' => $request->shipping_resi,
+            'status' => 'shipping'
+        ]);
+
+        return back()->with('success', 'Pesanan berhasil dikirim dengan Resi: ' . $request->shipping_resi);
     });
 
     // Admin Orders
