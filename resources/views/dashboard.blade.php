@@ -29,7 +29,10 @@
             </div>
         </div>
         
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+            @if(Auth::check())
+                @include('partials.notification-bell')
+            @endif
             <div class="relative" x-data="{ open: false }">
                 @if(Auth::check())
                     <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 focus:outline-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-full pl-3 pr-1 py-1 transition group">

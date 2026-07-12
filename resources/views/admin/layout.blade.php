@@ -77,6 +77,7 @@
             </div>
             
             <div class="flex items-center gap-3">
+                @include('partials.notification-bell')
                 <div class="text-right hidden sm:block">
                     <p class="text-sm font-bold text-gray-800 leading-tight">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-indigo-600 font-medium">Administrator</p>

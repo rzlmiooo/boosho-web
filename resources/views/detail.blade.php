@@ -35,7 +35,10 @@
                 @endif
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+        @if(Auth::check())
+            @include('partials.notification-bell')
+        @endif
         <!-- Profile Dropdown -->
         <div class="relative" x-data="{ open: false }">
             @if(Auth::check())

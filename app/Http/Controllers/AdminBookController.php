@@ -113,6 +113,17 @@ class AdminBookController extends Controller
             'discount_end' => $request->discount_end,
         ]);
 
+        // Kirim notifikasi promo diskon ke semua user
+        if ($request->discount_percent > 0) {
+            $bookCount = count($request->book_ids);
+            \App\Models\Notification::sendToAllUsers(
+                '🔥 Promo Diskon ' . $request->discount_percent . '% Spesial!',
+                'Ada ' . $bookCount . ' buku yang sedang diskon hingga ' . $request->discount_percent . '%. Jangan sampai kehabisan!',
+                '/katalog',
+                'promo'
+            );
+        }
+
         return redirect()->route('admin.books.index')->with('success', 'Diskon massal berhasil diterapkan pada ' . count($request->book_ids) . ' buku!');
     }
 }

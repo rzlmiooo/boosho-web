@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminBookController;
 use App\Models\Book;
-use App\Models\Cart; // Tambahkan ini
+use App\Models\Cart;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -380,6 +381,15 @@ Route::middleware('auth')->group(function () {
             $order->update(['total_price' => $totalPrice]);
 
             Illuminate\Support\Facades\DB::commit();
+
+            // 5. Kirim notifikasi ke Admin
+            $orderId = str_pad($order->id, 5, '0', STR_PAD_LEFT);
+            Notification::sendToAdmins(
+                '🛒 Pesanan Baru Masuk',
+                'Pelanggan ' . Auth::user()->name . ' baru saja checkout pesanan #' . $orderId . ' sebesar Rp ' . number_format($totalPrice, 0, ',', '.') . '.',
+                '/admin/orders',
+                'order'
+            );
             
             // Redirect langsung ke halaman akun agar user bisa lihat pesanannya
             return redirect('/account')->with('success', 'Checkout berhasil! Silakan cek detail pesanan Anda.');
@@ -427,6 +437,22 @@ Route::middleware('auth')->group(function () {
             return back()->with('error', 'Status pesanan tidak valid untuk pembayaran.');
         }
         $order->update(['status' => 'packing']);
+
+        $orderId = str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        Notification::sendToAdmins(
+            '💰 Pembayaran Terverifikasi',
+            'Pesanan #' . $orderId . ' telah dibayar oleh ' . Auth::user()->name . '. Silakan kemas barang.',
+            '/admin/orders',
+            'order'
+        );
+        Notification::sendToUser(
+            Auth::id(),
+            '📦 Pembayaran Berhasil',
+            'Pembayaran pesanan #' . $orderId . ' sukses! Buku Anda kini sedang dikemas oleh admin.',
+            '/account',
+            'order'
+        );
+
         return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan kini sedang dikemas.');
     });
 
@@ -437,6 +463,40 @@ Route::middleware('auth')->group(function () {
             return back()->with('error', 'Status pesanan tidak valid untuk konfirmasi penerimaan.');
         }
         $order->update(['status' => 'completed']);
+
+        $orderId = str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        Notification::sendToAdmins(
+            '✅ Pesanan Selesai',
+            'Pesanan #' . $orderId . ' telah diterima dengan baik oleh pelanggan ' . Auth::user()->name . '.',
+            '/admin/orders',
+            'order'
+        );
+        Notification::sendToUser(
+            Auth::id(),
+            '🎉 Transaksi Selesai',
+            'Terima kasih telah mengonfirmasi penerimaan barang untuk pesanan #' . $orderId . '.',
+            '/account',
+            'order'
+        );
+
+        // Kirim notifikasi rekomendasi buku berdasarkan buku yang baru dibeli
+        $boughtBooks = $order->items()->with('book')->get();
+        $categories = $boughtBooks->pluck('book.category')->filter()->unique()->toArray();
+        if (!empty($categories)) {
+            $recommended = Book::whereIn('category', $categories)
+                ->whereNotIn('id', $boughtBooks->pluck('book_id')->toArray())
+                ->inRandomOrder()->first();
+            if ($recommended) {
+                Notification::sendToUser(
+                    Auth::id(),
+                    '✨ Rekomendasi Buku Untukmu',
+                    'Karena Anda menyukai kategori "' . $recommended->category . '", coba baca "' . $recommended->title . '" oleh ' . $recommended->author . '!',
+                    '/books/' . $recommended->id,
+                    'recommendation'
+                );
+            }
+        }
+
         return back()->with('success', 'Pesanan selesai! Terima kasih telah berbelanja di BooSho.');
     });
 
@@ -456,6 +516,15 @@ Route::middleware('auth')->group(function () {
             'shipping_resi' => $request->shipping_resi,
             'status' => 'shipping'
         ]);
+
+        $orderId = str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        Notification::sendToUser(
+            $order->user_id,
+            '🚚 Pesanan Sedang Dikirim',
+            'Buku pesanan #' . $orderId . ' telah diserahkan ke kurir dengan nomor resi: ' . $request->shipping_resi . '.',
+            '/account',
+            'order'
+        );
 
         return back()->with('success', 'Pesanan berhasil dikirim dengan Resi: ' . $request->shipping_resi);
     });
@@ -486,6 +555,15 @@ Route::middleware('auth')->group(function () {
             'status' => 'waiting_payment'
         ]);
 
+        $orderId = str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        Notification::sendToUser(
+            $order->user_id,
+            '🔑 Kode Pembayaran Dikirim',
+            'Admin telah merilis kode Virtual Account ' . $request->payment_code . ' untuk pesanan #' . $orderId . '. Silakan lakukan pembayaran.',
+            '/account',
+            'order'
+        );
+
         return back()->with('success', 'Kode pembayaran berhasil dikirim!');
     });
 
@@ -501,6 +579,48 @@ Route::middleware('auth')->group(function () {
         'update' => 'admin.books.update',
         'destroy' => 'admin.books.destroy',
     ]);
+
+    // ---- NOTIFICATION ROUTES ----
+    Route::get('/api/notifications', function () {
+        $notifications = Notification::where('user_id', Auth::id())
+            ->latest()
+            ->take(15)
+            ->get()
+            ->map(function ($notif) {
+                return [
+                    'id' => $notif->id,
+                    'title' => $notif->title,
+                    'message' => $notif->message,
+                    'type' => $notif->type,
+                    'url' => $notif->url ? url('/notifications/' . $notif->id . '/read') : null,
+                    'is_read' => (bool)$notif->is_read,
+                    'created_at_human' => $notif->created_at->diffForHumans()
+                ];
+            });
+
+        $unreadCount = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'unread_count' => $unreadCount,
+            'notifications' => $notifications
+        ]);
+    })->name('api.notifications');
+
+    Route::post('/notifications/read-all', function () {
+        Notification::where('user_id', Auth::id())->where('is_read', false)->update(['is_read' => true]);
+        return back()->with('success', 'Semua notifikasi ditandai telah dibaca.');
+    })->name('notifications.readAll');
+
+    Route::get('/notifications/{id}/read', function ($id) {
+        $notif = Notification::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $notif->update(['is_read' => true]);
+        if ($notif->url) {
+            return redirect($notif->url);
+        }
+        return back();
+    })->name('notifications.read');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
